@@ -168,3 +168,27 @@ This document is owned by Tester and must evolve with the product.
 - Resolved blocker: **TEST-001-DB-001** — local MySQL 8.4 container is now isolated at `127.0.0.1:3306`, and its `agencysuit_test` database was migrated successfully. No production/shared database was contacted.
 - Coverage limitation: authenticated layout has no safe browser-accessible route; only the Blade fixture/test verifies its placeholder labels. This is not treated as E2E evidence.
 - Non-blocking: Vite emits an optional `fontaine` fallback-optimization warning while building successfully.
+
+---
+
+## TEST-002 — Authentication execution (2026-09-16)
+
+| ID | Scope | Actual result | Result | Evidence |
+|---|---|---|---|---|
+| AUTH-001 | Register | Email/password registration creates a hashed password and starts an authenticated session. | PASS | `AuthenticationTest::test_auth_001_*` |
+| AUTH-002 | Login | Valid email/password redirects to Today and authenticates the user. | PASS | `AuthenticationTest::test_auth_002_*` |
+| AUTH-003 | Wrong password | Invalid password redirects to login with an email error and retains guest state. | PASS | `AuthenticationTest::test_auth_003_*` |
+| AUTH-004 | Logout | Logout invalidates the session; Today is protected afterward. | PASS | `AuthenticationTest::test_auth_004_*` |
+| AUTH-005 | Password reset | Reset-link notification and token-based password reset both pass. | PASS | `AuthenticationTest::test_auth_007_*`, `test_auth_008_*` |
+| AUTH-006 | Protected route | Guest is redirected from Today; authenticated user receives Today. | PASS | `AuthenticationTest::test_auth_005_*`, `test_auth_006_*` |
+| AUTH-007 | Google mock | Mocked callback creates/links Google identity without a real OAuth request; cancellation and unconfigured fallback are handled. | PASS | `AuthenticationTest::test_auth_010_*` through `test_auth_012_*` |
+| AUTH-009 | Duplicate email | Duplicate registration returns an email validation error and does not add a user. | PASS | `AuthenticationTest::test_auth_009_*` |
+| MOB-AUTH-001 | Mobile smoke | Login had no horizontal overflow at 360×800, 390×844, or 412×915; required fields and main controls are 48px; password visibility toggle works. | PASS | Local browser smoke |
+| SEC-AUTH-001 | Secret check | Google client variables are empty placeholders in example env files; no assigned credential is a Git candidate. | PASS | Staged-candidate review |
+
+### TEST-002 release-gate outcome
+
+- Scope: Authentication only; full regression was not run.
+- Result: **PASS LOCALLY — ready for staged Git review**.
+- Automated evidence: `php artisan test --filter=AuthenticationTest` passed 13 tests / 57 assertions on MySQL `agencysuit_test`.
+- Non-blocking: Vite emits the existing optional `fontaine` fallback-optimization warning while building successfully.

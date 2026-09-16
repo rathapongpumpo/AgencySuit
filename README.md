@@ -18,6 +18,10 @@ Never run automated tests, `migrate:fresh`, `db:wipe`, or other destructive deve
 
 `.env` and `.env.testing` are local-only and must never be committed. `.env.example` and `.env.testing.example` contain no credentials and are safe to track.
 
+## Google Login
+
+Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GOOGLE_REDIRECT_URI` only in the local or production `.env`; register the same callback URL in Google Cloud. If these values are blank, the Google button returns to Login with a clear message and email login remains available.
+
 ## Agent pack
 
 Files:

@@ -13,11 +13,12 @@ class ApplicationBootTest extends TestCase
         $this->assertSame('agencysuit_test', config('database.connections.mysql.database'));
     }
 
-    public function test_the_guest_foundation_page_loads(): void
+    public function test_the_root_route_sends_guests_to_login(): void
     {
         $this->get('/')
-            ->assertOk()
-            ->assertSee('AgencySuit');
+            ->assertRedirect(route('today'));
+
+        $this->get(route('today'))->assertRedirect(route('login'));
     }
 
     public function test_the_authenticated_layout_reserves_the_four_primary_mobile_destinations(): void
