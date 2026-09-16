@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\GoogleOAuthController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\PropertyController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/today');
@@ -24,7 +25,13 @@ Route::middleware('guest')->group(function (): void {
 
 Route::middleware('auth')->group(function (): void {
     Route::view('/today', 'today')->name('today');
-    Route::view('/properties', 'properties.index')->name('properties.index');
+    Route::get('/properties', [PropertyController::class, 'index'])->name('properties.index');
+    Route::get('/properties/create', [PropertyController::class, 'create'])->name('properties.create');
+    Route::post('/properties', [PropertyController::class, 'store'])->name('properties.store');
+    Route::get('/properties/{property}', [PropertyController::class, 'show'])->name('properties.show');
+    Route::get('/properties/{property}/edit', [PropertyController::class, 'edit'])->name('properties.edit');
+    Route::put('/properties/{property}', [PropertyController::class, 'update'])->name('properties.update');
+    Route::patch('/properties/{property}/status', [PropertyController::class, 'updateStatus'])->name('properties.status.update');
     Route::view('/clients', 'clients.index')->name('clients.index');
     Route::view('/more', 'more')->name('more');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');

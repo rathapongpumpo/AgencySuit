@@ -164,3 +164,25 @@ This document is owned by Tester and must evolve with the product.
 - Scope: TASK-003 Mobile App Shell plus Authentication regression only; full product regression was not run.
 - Automated evidence: `php artisan test tests/Feature/AuthenticationTest.php tests/Feature/MobileAppShellTest.php` passed 15 tests / 82 assertions on MySQL `agencysuit_test`.
 - Non-blocking: Quick Add dialog renders from the top edge rather than as a bottom-aligned sheet; its four future actions are intentionally non-interactive until their respective form tasks.
+
+## TEST-004 — Property Core execution (2026-09-16)
+
+| ID | Scope | Actual result | Result | Evidence |
+|---|---|---|---|---|
+| PROP-001 | Quick Add minimum fields | Quick Add → เพิ่มทรัพย์ opens `/properties/create`; form has 5 logical required fields: type, name, price, bedrooms, location. | PASS | Browser smoke; `PropertyTest` |
+| PROP-002 | Required-field validation | Blank form is invalid in browser; server rejects invalid type/name/price/bedrooms/location and stores no record. | PASS | Browser validity check; `PropertyTest` |
+| PROP-003 | Property list/detail/edit | Authenticated user can create, list, open detail, and edit core fields with success feedback. | PASS | Browser smoke; `PropertyTest` |
+| PROP-004 | Status change | Status selector changes available → reserved and persists/display labels correctly. | PASS | Browser smoke; `PropertyTest` |
+| SEC-001/002 | Guest + cross-user isolation | Guest property routes redirect to login; another user cannot view/edit/status-update the property and list excludes it. | PASS | `PropertyTest` |
+| PLAN-001/002/003 | Centralized free limit | Limit is read from `config/plans.php` (`free.limits.properties = 10`); item 11 is blocked with clear message and existing records remain. | PASS | `PropertyTest`; config inspection |
+| MOB-001/002/003/004/005/006/008 | Mobile property UX | Property list, detail, and edit render at 360×800, 390×844, 412×915 with no horizontal overflow; cards and CTAs are tappable. | PASS | Playwright screenshots/metrics |
+| UX-004 | UX/UI anti-pattern gate | No table, dashboard/KPI grid, gradient, glassmorphism, oversized image, owner/matching/client feature, or extra top-level navigation introduced. | PASS | UX/UI review; route/view inspection |
+| SEC-008/009 | Secret + DB safety | No env/credential files staged; tests/migration use local Docker MySQL only (`127.0.0.1:3306/agencysuit_test`). | PASS | Staged review; `migrate:status` |
+
+### TEST-004 release-gate outcome
+
+- Scope: TASK-004 Property Core plus Authentication/App Shell regression; full product regression was not run.
+- Automated evidence: `php artisan test tests/Feature/PropertyTest.php tests/Feature/AuthenticationTest.php tests/Feature/MobileAppShellTest.php` passed 24 tests / 139 assertions.
+- Build/style evidence: `npm run build` PASS; `vendor\\bin\\pint --test` PASS.
+- Migration evidence: Docker `mysql:8.4` container `agencysuit-mysql-test` on `127.0.0.1:3306`; migration `2026_09_16_000004_create_properties_table` is Ran.
+- Developer Handoff file was not present in the repository; release decision is based on the actual working-tree diff and executed checks.

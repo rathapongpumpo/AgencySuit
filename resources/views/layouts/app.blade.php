@@ -20,7 +20,9 @@
             </main>
         </div>
 
-        <button type="button" data-quick-add-open aria-haspopup="dialog" aria-controls="quick-add-sheet" class="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 z-20 flex size-13 items-center justify-center rounded-full bg-green-900 text-3xl font-light leading-none text-white shadow-lg shadow-green-950/20" aria-label="เพิ่มรายการ">+</button>
+        @unless (request()->routeIs('properties.create', 'properties.edit'))
+            <button type="button" data-quick-add-open aria-haspopup="dialog" aria-controls="quick-add-sheet" class="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 z-20 flex size-13 items-center justify-center rounded-full bg-green-900 text-3xl font-light leading-none text-white shadow-lg shadow-green-950/20" aria-label="เพิ่มรายการ">+</button>
+        @endunless
 
         <nav aria-label="เมนูหลัก" class="fixed inset-x-0 bottom-0 z-10 border-t border-stone-200 bg-white px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2">
             <div class="mx-auto grid max-w-lg grid-cols-4 gap-1">
@@ -38,7 +40,11 @@
                 <p class="mt-1 text-sm text-stone-600">เลือกสิ่งที่ต้องการเริ่มต้น</p>
                 <div class="mt-4 divide-y divide-stone-100 rounded-xl border border-stone-200">
                     @foreach (['เพิ่มทรัพย์', 'เพิ่มลูกค้า', 'นัดดู', 'ติดตาม'] as $action)
-                        <span class="flex min-h-13 items-center px-4 text-base font-medium text-stone-700">{{ $action }}</span>
+                        @if ($action === 'เพิ่มทรัพย์')
+                            <a href="{{ route('properties.create') }}" class="flex min-h-13 items-center px-4 text-base font-medium text-stone-700">{{ $action }}</a>
+                        @else
+                            <span class="flex min-h-13 items-center px-4 text-base font-medium text-stone-700">{{ $action }}</span>
+                        @endif
                     @endforeach
                 </div>
                 <p class="mt-3 text-sm text-stone-500">ฟอร์มเพิ่มข้อมูลจะพร้อมในขั้นตอนถัดไป</p>
