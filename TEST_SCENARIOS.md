@@ -146,49 +146,21 @@ This document is owned by Tester and must evolve with the product.
 
 ---
 
-## TEST-001 — Project Foundation execution (2026-09-16)
-
-| ID | Feature | Preconditions | Steps | Expected result | Actual result | Result | Evidence |
-|---|---|---|---|---|---|---|---|
-| FOUND-001 | Laravel application boots | Dependencies installed | `php artisan test`; load `/` locally | App boots and foundation page responds | 8 tests / 17 assertions passed; `GET /` returned 200 | PASS | `php artisan test`; local HTTP smoke |
-| FOUND-002 | Test environment uses MySQL test DB | MySQL 8.4 container `agencysuit-mysql-test`; `.env.testing` and PHPUnit target `127.0.0.1/agencysuit_test` | Confirm bound port; migrate; run migration status and suite | Separate local MySQL is available and test DB can be migrated/tested | Container is bound to `127.0.0.1:3306`; `agencysuit_test` exists; all three baseline migrations ran in batch 1; suite passed. | PASS | Docker MySQL 8.4; `php artisan migrate --env=testing --force`; `php artisan test` |
-| FOUND-003 | Production-host safety guard | Unit test suite | Run guard test for `194.59.164.72` | Automated tests abort | Guard unit test passed; application service invokes it while unit tests run | PASS | `DatabaseSafetyGuardTest` |
-| FOUND-004 | Production-database safety guard | Unit test suite | Run guard test for `propagent` | Automated tests abort | Guard unit test passed; destructive `migrate:fresh` case passed | PASS | `DatabaseSafetyGuardTest` |
-| FOUND-005 | `.env` not tracked | Repository working tree | Inspect `git status`, `git ls-files`, `.gitignore` | Local env files excluded from Git | `.env` and `.env.testing` are ignored; no files are currently tracked | PASS | Git inspection |
-| FOUND-006 | Frontend build | Node dependencies installed | `npm run build` | Production bundle builds | Build passed; optional `fontaine` warning only | PASS | `npm run build` |
-| FOUND-007 | Mobile base layout 360×800 | Local server at `127.0.0.1:8000` | Browser smoke at 360×800 | No horizontal overflow | Guest foundation page: 360px scroll width / 360px client width; static authenticated Blade includes all four required labels | PASS | Local browser smoke; `ApplicationBootTest` |
-| FOUND-008 | Mobile base layout 390×844 | Local server at `127.0.0.1:8000` | Browser smoke at 390×844 | No horizontal overflow | Guest foundation page: 390px scroll width / 390px client width; authenticated layout has no browser route in this foundation | PASS | Local browser smoke; scope limitation recorded |
-| FOUND-009 | Mobile base layout 412×915 | Local server at `127.0.0.1:8000` | Browser smoke at 412×915 | No horizontal overflow | Guest foundation page: 412px scroll width / 412px client width; authenticated layout verified only as a Blade fixture | PASS | Local browser smoke; `ApplicationBootTest` |
-| FOUND-010 | Free plan centralized config | Source tree | Inspect config and references | Limits are centralized, not duplicated | `config/plans.php` defines 10 properties, 5 clients, 3 photos/property, 1 active deal; no duplicate enforcement code exists yet | PASS | Source inspection |
-| FOUND-011 | No production secrets in Git | Repository working tree | Inspect tracked/candidate files and secret patterns | No password/key/token is commit candidate | No tracked files; `.env` files ignored; scan found documentation placeholders only | PASS | Git and candidate-file scan |
-
-### TEST-001 release-gate outcome
-
-- Result: **PASS LOCALLY — ready for Git staging/push review**.
-- Resolved blocker: **TEST-001-DB-001** — local MySQL 8.4 container is now isolated at `127.0.0.1:3306`, and its `agencysuit_test` database was migrated successfully. No production/shared database was contacted.
-- Coverage limitation: authenticated layout has no safe browser-accessible route; only the Blade fixture/test verifies its placeholder labels. This is not treated as E2E evidence.
-- Non-blocking: Vite emits an optional `fontaine` fallback-optimization warning while building successfully.
-
----
-
-## TEST-002 — Authentication execution (2026-09-16)
+## TEST-003 — Mobile App Shell execution (2026-09-16)
 
 | ID | Scope | Actual result | Result | Evidence |
 |---|---|---|---|---|
-| AUTH-001 | Register | Email/password registration creates a hashed password and starts an authenticated session. | PASS | `AuthenticationTest::test_auth_001_*` |
-| AUTH-002 | Login | Valid email/password redirects to Today and authenticates the user. | PASS | `AuthenticationTest::test_auth_002_*` |
-| AUTH-003 | Wrong password | Invalid password redirects to login with an email error and retains guest state. | PASS | `AuthenticationTest::test_auth_003_*` |
-| AUTH-004 | Logout | Logout invalidates the session; Today is protected afterward. | PASS | `AuthenticationTest::test_auth_004_*` |
-| AUTH-005 | Password reset | Reset-link notification and token-based password reset both pass. | PASS | `AuthenticationTest::test_auth_007_*`, `test_auth_008_*` |
-| AUTH-006 | Protected route | Guest is redirected from Today; authenticated user receives Today. | PASS | `AuthenticationTest::test_auth_005_*`, `test_auth_006_*` |
-| AUTH-007 | Google mock | Mocked callback creates/links Google identity without a real OAuth request; cancellation and unconfigured fallback are handled. | PASS | `AuthenticationTest::test_auth_010_*` through `test_auth_012_*` |
-| AUTH-009 | Duplicate email | Duplicate registration returns an email validation error and does not add a user. | PASS | `AuthenticationTest::test_auth_009_*` |
-| MOB-AUTH-001 | Mobile smoke | Login had no horizontal overflow at 360×800, 390×844, or 412×915; required fields and main controls are 48px; password visibility toggle works. | PASS | Local browser smoke |
-| SEC-AUTH-001 | Secret check | Google client variables are empty placeholders in example env files; no assigned credential is a Git candidate. | PASS | Staged-candidate review |
+| SHELL-001 | Login to Today | Email registration/login reaches `/today`. | PASS | Browser smoke; `AuthenticationTest` |
+| SHELL-002 | Protected destinations | Guests are redirected from Today, Properties, Clients, and More. | PASS | `MobileAppShellTest` |
+| SHELL-003 | Bottom navigation | Today, Properties, Clients, and More links are present and route correctly. | PASS | Browser smoke |
+| SHELL-004 | Quick Add | Opens and closes; shows exactly เพิ่มทรัพย์, เพิ่มลูกค้า, นัดดู, ติดตาม. | PASS | Browser smoke |
+| SHELL-005 | Empty states | Today, Properties, and Clients provide one clear empty-state CTA; no CRUD routes exist. | PASS | Browser smoke; route inspection |
+| SHELL-006 | Logout | Logout returns to Login; protected Today then redirects to Login. | PASS | Browser smoke; `AuthenticationTest` |
+| SHELL-007 | Mobile/UX gate | 360×800, 390×844, 412×915 render without observed horizontal overflow; no tables, KPI grids, gradients, or glassmorphism. | PASS | Playwright screenshots; UX/UI review |
+| SEC-SHELL-001 | Secret check | No local `.env` files or assigned credentials are staged. | PASS | Staged review |
 
-### TEST-002 release-gate outcome
+### TEST-003 release-gate outcome
 
-- Scope: Authentication only; full regression was not run.
-- Result: **PASS LOCALLY — ready for staged Git review**.
-- Automated evidence: `php artisan test --filter=AuthenticationTest` passed 13 tests / 57 assertions on MySQL `agencysuit_test`.
-- Non-blocking: Vite emits the existing optional `fontaine` fallback-optimization warning while building successfully.
+- Scope: TASK-003 Mobile App Shell plus Authentication regression only; full product regression was not run.
+- Automated evidence: `php artisan test tests/Feature/AuthenticationTest.php tests/Feature/MobileAppShellTest.php` passed 15 tests / 82 assertions on MySQL `agencysuit_test`.
+- Non-blocking: Quick Add dialog renders from the top edge rather than as a bottom-aligned sheet; its four future actions are intentionally non-interactive until their respective form tasks.

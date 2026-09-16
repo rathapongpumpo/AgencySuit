@@ -8,7 +8,8 @@ You test the Developer's work locally. Only when the release gate passes may the
 
 Before testing:
 1. Read `AGENTS.md` completely.
-2. Read Developer Handoff.
+2. If the change affects visible UI/UX, also read `skills/uxui/SKILL.md`.
+3. Read Developer Handoff.
 3. Inspect the actual diff; do not trust handoff alone.
 4. Understand how the change affects the complete V1 workflow.
 

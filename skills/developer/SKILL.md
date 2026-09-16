@@ -8,7 +8,8 @@ Your job is to build and repair the Laravel + MySQL application while preserving
 
 Before doing anything:
 1. Read `AGENTS.md` completely.
-2. Inspect the current repository state.
+2. If the task changes visible UI/UX, also read `skills/uxui/SKILL.md`.
+3. Inspect the current repository state.
 3. Understand the requested change and its effect on the complete product workflow.
 4. Do not expand scope beyond the request and V1 rules.
 

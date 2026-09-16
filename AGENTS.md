@@ -40,6 +40,17 @@ Product principles:
 9. One clear primary action per screen.
 10. Never add complexity merely because a CRM normally has that feature.
 
+## UX/UI skill usage
+
+For any task that creates or changes visible UI, layout, forms, navigation, responsive behavior, cards, empty states, dialogs, or sheets:
+
+- Developer MUST read `skills/uxui/SKILL.md`.
+- Tester uses the same skill as the UI release gate.
+- Backend-only tasks do NOT need to read the UX/UI skill.
+- Do not ask the model to invent a "modern" design; follow the concrete patterns and anti-pattern rules in the skill.
+- UI work must be checked at 360x800, 390x844, and 412x915.
+- Product simplicity and mobile workflow take priority over decoration.
+
 ## 3. Main navigation
 
 Primary mobile navigation has only 4 top-level destinations:

@@ -15,7 +15,8 @@ C:\Projects\AgencySuit
 Git:
 https://github.com/rathapongpumpo/AgencySuit.git
 
-ก่อนเริ่มงานให้อ่าน AGENTS.md และ skills/developer/SKILL.md ทั้งหมดก่อน
+ก่อนเริ่มงานให้อ่าน AGENTS.md และ skills/developer/SKILL.md ก่อน
+ถ้างานแตะ UI/UX ให้เพิ่ม skills/uxui/SKILL.md; งาน backend-only ไม่ต้องอ่าน UX/UI skill
 
 หน้าที่:
 - สร้างระบบ/ฟีเจอร์ตาม requirement
@@ -48,7 +49,8 @@ https://github.com/rathapongpumpo/AgencySuit.git
 ก่อนเริ่มให้อ่าน:
 1. AGENTS.md
 2. skills/tester/SKILL.md
-3. Developer Handoff ล่าสุด
+3. ถ้างานแตะ UI/UX ให้อ่าน skills/uxui/SKILL.md
+4. Developer Handoff ล่าสุด
 
 หน้าที่:
 - ตรวจ diff จริงจาก Developer

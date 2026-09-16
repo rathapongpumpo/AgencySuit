@@ -3,14 +3,17 @@
 @section('title', 'เพิ่มเติม | AgencySuit')
 
 @section('content')
-    <p class="text-sm font-semibold text-green-800">AgencySuit</p>
-    <h1 class="mt-2 text-3xl font-bold tracking-tight">เพิ่มเติม</h1>
-    <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-5">
-        <h2 class="font-semibold">บัญชี</h2>
-        <p class="mt-2 text-sm text-stone-600">{{ auth()->user()->email }}</p>
-        <form method="POST" action="{{ route('logout') }}" class="mt-5">
+    <p class="text-sm font-semibold text-green-800">เพิ่มเติม</p>
+    <h1 class="mt-2 text-2xl font-bold tracking-tight">การตั้งค่า</h1>
+
+    <section class="mt-6 divide-y divide-stone-200 border-y border-stone-200 bg-white">
+        <div class="flex min-h-15 items-center justify-between gap-4 px-4">
+            <div><h2 class="font-medium">บัญชีผู้ใช้</h2><p class="mt-0.5 text-sm text-stone-600">{{ auth()->user()->email }}</p></div>
+        </div>
+        <div class="flex min-h-15 items-center justify-between gap-4 px-4 text-stone-500"><span class="font-medium">ส่งความคิดเห็น</span><span class="text-sm">เร็ว ๆ นี้</span></div>
+        <form method="POST" action="{{ route('logout') }}" class="px-4 py-2">
             @csrf
-            <button type="submit" class="min-h-12 w-full rounded-xl border border-stone-300 bg-white px-5 text-base font-semibold text-stone-800">ออกจากระบบ</button>
+            <button type="submit" class="min-h-11 text-sm font-semibold text-red-700">ออกจากระบบ</button>
         </form>
     </section>
 @endsection

@@ -3,10 +3,7 @@
 @section('title', 'วันนี้ | AgencySuit')
 
 @section('content')
-    <p class="text-sm font-semibold text-green-800">AgencySuit</p>
-    <h1 class="mt-2 text-3xl font-bold tracking-tight">วันนี้</h1>
-    <section class="mt-6 rounded-2xl border border-stone-200 bg-white p-5">
-        <h2 class="font-semibold">พร้อมเริ่มต้น</h2>
-        <p class="mt-2 text-sm leading-6 text-stone-600">หน้าการทำงานประจำวันจะพร้อมในขั้นตอนถัดไป</p>
-    </section>
+    <p class="text-sm font-semibold text-green-800">วันนี้</p>
+    <h1 class="mt-2 text-2xl font-bold tracking-tight">ยังไม่มีรายการต้องทำ</h1>
+    <x-empty-state title="เริ่มจัดงานของคุณ" description="เพิ่มทรัพย์หรือลูกค้ารายแรก แล้วระบบจะช่วยรวมงานที่ต้องติดตามไว้ที่นี่" action="เพิ่มรายการแรก" />
 @endsection

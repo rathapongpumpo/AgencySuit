@@ -24,6 +24,8 @@ Route::middleware('guest')->group(function (): void {
 
 Route::middleware('auth')->group(function (): void {
     Route::view('/today', 'today')->name('today');
+    Route::view('/properties', 'properties.index')->name('properties.index');
+    Route::view('/clients', 'clients.index')->name('clients.index');
     Route::view('/more', 'more')->name('more');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
