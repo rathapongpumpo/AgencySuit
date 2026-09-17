@@ -22,7 +22,7 @@ jobs:
       SSH_USER: ${{ secrets.SSH_USER || 'u271733843' }}
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       REMOTE_BASE: ${{ secrets.REMOTE_BASE || '/home/u271733843/agencysuit' }}
-      PUBLIC_PATH: ${{ secrets.PUBLIC_PATH || '/home/u271733843/domains/darkgray-duck-178765.hostingersite.com/public_html' }}
+      PUBLIC_PATH: /home/u271733843/domains/darkgray-duck-178765.hostingersite.com/public_html
 
     steps:
       - name: Checkout
