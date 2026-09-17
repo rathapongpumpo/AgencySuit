@@ -21,7 +21,7 @@ jobs:
       SSH_PORT: ${{ secrets.SSH_PORT }}
       SSH_USER: ${{ secrets.SSH_USER }}
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      REMOTE_BASE: ${{ secrets.REMOTE_BASE || secrets.REMOTE_PATH || '/home/u271733843/agencysuit' }}
+      REMOTE_BASE: ${{ secrets.REMOTE_BASE || '/home/u271733843/agencysuit' }}
       PUBLIC_PATH: ${{ secrets.PUBLIC_PATH || '/home/u271733843/domains/darkgray-duck-178765.hostingersite.com/public_html' }}
 
     steps:
