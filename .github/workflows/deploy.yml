@@ -120,7 +120,9 @@ jobs:
           ln -s "$shared_storage" "$release/storage"
 
           "$php_bin" "$composer_bin" install \
-            --no-dev --prefer-dist --optimize-autoloader --no-interaction
+            --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-scripts
+
+          "$php_bin" "$release/artisan" package:discover --ansi
 
           mkdir -p "$release/bootstrap/cache" "$shared_storage/app/private" \
             "$shared_storage/framework/cache" "$shared_storage/framework/sessions" \
