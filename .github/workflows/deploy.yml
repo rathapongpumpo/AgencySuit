@@ -94,6 +94,7 @@ jobs:
           ssh -p "$SSH_PORT" -o BatchMode=yes "$SSH_USER@$HOST" \
             "bash -s -- '$REMOTE_BASE' '$PUBLIC_PATH' '$release' '$MIGRATIONS_CHANGED'" <<'REMOTE'
           set -euo pipefail
+          trap 'status=$?; echo "::error title=Remote deploy failed::line ${LINENO}: ${BASH_COMMAND} (exit ${status})"; exit ${status}' ERR
 
           remote_base="$1"
           public_path="$2"
