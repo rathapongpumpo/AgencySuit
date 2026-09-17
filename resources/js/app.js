@@ -54,3 +54,46 @@ document.querySelectorAll('[data-photo-input]').forEach((input) => {
         });
     });
 });
+
+document.querySelectorAll('[data-share-form]').forEach((form) => {
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const selected = Array.from(form.querySelectorAll('[data-share-property]:checked'));
+        const feedback = form.querySelector('[data-share-feedback]');
+
+        if (selected.length === 0) {
+            if (feedback) feedback.textContent = 'เลือกทรัพย์อย่างน้อย 1 รายการ';
+            return;
+        }
+
+        const text = selected.map((item) => [
+            item.dataset.shareName,
+            `${item.dataset.shareType} · ${item.dataset.sharePrice}`,
+            `${item.dataset.shareBedrooms} ห้องนอน · ${item.dataset.shareLocation}`,
+        ].join('\n')).join('\n\n');
+
+        const copyText = async () => {
+            if (window.navigator.clipboard?.writeText) {
+                await window.navigator.clipboard.writeText(text);
+                if (feedback) feedback.textContent = 'คัดลอกข้อความแล้ว นำไปส่งให้ลูกค้าได้เลย';
+                return;
+            }
+
+            if (feedback) feedback.textContent = text;
+        };
+
+        try {
+            if (typeof window.navigator.share === 'function') {
+                await Promise.race([
+                    window.navigator.share({ title: 'ทรัพย์ที่น่าสนใจ', text }),
+                    new Promise((_, reject) => window.setTimeout(() => reject(new Error('share-timeout')), 1500)),
+                ]);
+                if (feedback) feedback.textContent = 'เปิดหน้าต่างแชร์แล้ว';
+                return;
+            }
+            await copyText();
+        } catch (error) {
+            if (error?.name !== 'AbortError') await copyText();
+        }
+    });
+});

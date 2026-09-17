@@ -12,7 +12,6 @@
     <h1 class="mt-4 text-2xl font-bold tracking-tight">{{ $property->name }}</h1>
     <p class="mt-2 text-sm text-stone-600">{{ $property->transaction_label }} · {{ $property->status_label }}</p>
 
-    @php($photoLimit = (int) config('plans.free.limits.photos_per_property'))
     @php($photoErrors = collect($errors->messages())
         ->filter(fn (array $messages, string $key): bool => $key === 'photos' || str_starts_with($key, 'photos.'))
         ->flatten()
@@ -53,7 +52,7 @@
             </div>
         @endif
 
-        @if ($property->photos->count() < $photoLimit)
+        @if ($photoLimit === null || $property->photos->count() < $photoLimit)
             <form method="POST" action="{{ route('properties.photos.store', $property) }}" enctype="multipart/form-data" class="mt-5 space-y-3" data-photo-upload>
                 @csrf
                 <label for="photos" class="block text-sm font-medium text-stone-800">เพิ่มรูป</label>
@@ -92,6 +91,32 @@
             <dd class="text-base font-semibold text-green-800">{{ $property->status_label }}</dd>
         </div>
     </dl>
+
+    <section class="mt-6" aria-labelledby="client-matches-heading">
+        <div class="flex items-end justify-between gap-3">
+            <h2 id="client-matches-heading" class="text-lg font-semibold">ลูกค้าที่ตรงกับทรัพย์นี้</h2>
+            <span class="text-sm text-stone-500">{{ $clientMatches->count() }} รายการ</span>
+        </div>
+        @if ($clientMatches->isEmpty())
+            <p class="mt-3 border-y border-stone-200 bg-white px-4 py-4 text-sm leading-6 text-stone-600">ยังไม่มีลูกค้าของคุณที่ตรงกับทรัพย์นี้</p>
+        @else
+            <ul class="mt-3 divide-y divide-stone-200 border-y border-stone-200 bg-white">
+                @foreach ($clientMatches as $match)
+                    @php($client = $match['client'])
+                    <li>
+                        <a href="{{ route('clients.show', $client) }}" class="block px-4 py-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700">
+                            <div class="flex items-start justify-between gap-3">
+                                <h3 class="min-w-0 truncate text-base font-semibold">{{ $client->name }}</h3>
+                                <span class="shrink-0 text-sm font-semibold text-green-800">Match {{ $match['percentage'] }}%</span>
+                            </div>
+                            <p class="mt-1 text-sm text-stone-600">{{ $client->transactionLabel() }} · งบ {{ $client->formattedBudget() }}</p>
+                            <p class="mt-1 text-sm text-stone-600">{{ $client->locations }}</p>
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+    </section>
 
     <div class="mt-6 space-y-3">
         <a href="{{ route('properties.edit', $property) }}" class="flex min-h-12 w-full items-center justify-center rounded-xl bg-green-900 px-5 text-base font-semibold text-white">แก้ไข</a>

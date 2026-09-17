@@ -20,7 +20,7 @@
             </main>
         </div>
 
-        @unless (request()->routeIs('properties.create', 'properties.edit', 'clients.create', 'clients.edit'))
+        @unless (request()->routeIs('properties.create', 'properties.edit', 'clients.create', 'clients.edit', 'appointments.create', 'appointments.edit', 'clients.appointments.create', 'clients.deals.create', 'deals.edit'))
             <button type="button" data-quick-add-open aria-haspopup="dialog" aria-controls="quick-add-sheet" class="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 z-20 flex size-13 items-center justify-center rounded-full bg-green-900 text-3xl font-light leading-none text-white shadow-lg shadow-green-950/20" aria-label="เพิ่มรายการ">+</button>
         @endunless
 
@@ -33,7 +33,7 @@
             </div>
         </nav>
 
-        <dialog id="quick-add-sheet" aria-labelledby="quick-add-title" class="m-0 w-full max-w-lg rounded-t-2xl border-0 bg-white p-0 text-stone-950 shadow-2xl backdrop:bg-stone-950/30">
+        <dialog id="quick-add-sheet" aria-labelledby="quick-add-title" class="fixed inset-x-0 bottom-0 top-[auto] mx-auto mb-0 mt-auto w-full max-w-lg rounded-t-2xl border-0 bg-white p-0 text-stone-950 shadow-2xl backdrop:bg-stone-950/30">
             <section class="px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3">
                 <div class="mx-auto h-1 w-10 rounded-full bg-stone-300"></div>
                 <div class="mt-5 flex items-center justify-between gap-4"><h2 id="quick-add-title" class="text-lg font-semibold">เพิ่มรายการ</h2><button type="button" data-quick-add-close class="min-h-11 px-2 text-sm font-medium text-stone-600">ปิด</button></div>
@@ -44,6 +44,10 @@
                             <a href="{{ route('properties.create') }}" class="flex min-h-13 items-center px-4 text-base font-medium text-stone-700">{{ $action }}</a>
                         @elseif ($action === 'เพิ่มลูกค้า')
                             <a href="{{ route('clients.create') }}" class="flex min-h-13 items-center px-4 text-base font-medium text-stone-700">{{ $action }}</a>
+                        @elseif ($action === 'นัดดู')
+                            <a href="{{ route('appointments.create') }}" class="flex min-h-13 items-center px-4 text-base font-medium text-stone-700">{{ $action }}</a>
+                        @elseif ($action === 'ติดตาม')
+                            <a href="{{ route('followups.create') }}" class="flex min-h-13 items-center px-4 text-base font-medium text-stone-700">{{ $action }}</a>
                         @else
                             <span class="flex min-h-13 items-center px-4 text-base font-medium text-stone-700">{{ $action }}</span>
                         @endif

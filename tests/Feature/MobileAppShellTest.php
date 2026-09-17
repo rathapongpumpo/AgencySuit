@@ -29,7 +29,9 @@ class MobileAppShellTest extends TestCase
             ->assertSee('เพิ่มลูกค้า')
             ->assertSee(route('clients.create'), false)
             ->assertSee('นัดดู')
-            ->assertSee('ติดตาม');
+            ->assertSee(route('appointments.create'), false)
+            ->assertSee('ติดตาม')
+            ->assertSee(route('followups.create'), false);
 
         $this->actingAs($user)->get(route('properties.index'))
             ->assertOk()

@@ -11,7 +11,11 @@ return [
     ],
 
     'pro' => [
-        // Paid limits are intentionally configured here later.
-        'limits' => [],
+        'limits' => [
+            'properties' => null,
+            'clients' => null,
+            'photos_per_property' => null,
+            'active_deals' => null,
+        ],
     ],
 ];

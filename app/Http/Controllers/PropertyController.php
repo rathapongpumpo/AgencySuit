@@ -7,6 +7,8 @@ use App\Http\Requests\PropertyRequest;
 use App\Http\Requests\PropertyStatusRequest;
 use App\Models\Property;
 use App\Models\PropertyPhoto;
+use App\Services\MatchingService;
+use App\Services\PlanService;
 use App\Services\PropertyPhotoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,23 +25,23 @@ class PropertyController extends Controller
         ]);
     }
 
-    public function create(Request $request): View
+    public function create(Request $request, PlanService $planService): View
     {
-        $limit = (int) config('plans.free.limits.properties');
+        $limit = $planService->limit($request->user(), 'properties');
         $propertyCount = $request->user()->properties()->count();
 
         return view('properties.create', [
             'limit' => $limit,
-            'limitReached' => $propertyCount >= $limit,
+            'limitReached' => $planService->reached($request->user(), 'properties', $propertyCount),
         ]);
     }
 
-    public function store(PropertyRequest $request): RedirectResponse
+    public function store(PropertyRequest $request, PlanService $planService): RedirectResponse
     {
-        $limit = (int) config('plans.free.limits.properties');
+        $limit = $planService->limit($request->user(), 'properties');
         $propertyCount = $request->user()->properties()->count();
 
-        if ($propertyCount >= $limit) {
+        if ($planService->reached($request->user(), 'properties', $propertyCount)) {
             return to_route('properties.create')
                 ->withInput()
                 ->with('limit_reached', "แพ็กเกจฟรีเพิ่มทรัพย์ได้สูงสุด {$limit} รายการ ข้อมูลเดิมยังอยู่ครบ");
@@ -53,7 +55,7 @@ class PropertyController extends Controller
         return to_route('properties.show', $property)->with('success', 'บันทึกทรัพย์แล้ว');
     }
 
-    public function show(Property $property): View
+    public function show(Property $property, MatchingService $matchingService, PlanService $planService): View
     {
         Gate::authorize('view', $property);
         $property->load(['photos', 'primaryPhoto']);
@@ -61,6 +63,8 @@ class PropertyController extends Controller
         return view('properties.show', [
             'property' => $property,
             'statusOptions' => config('properties.statuses', []),
+            'clientMatches' => $matchingService->forProperty($property),
+            'photoLimit' => $planService->limit(request()->user(), 'photos_per_property'),
         ]);
     }
 
@@ -87,15 +91,15 @@ class PropertyController extends Controller
         return to_route('properties.show', $property)->with('success', 'เปลี่ยนสถานะแล้ว');
     }
 
-    public function storePhoto(PropertyPhotoRequest $request, Property $property, PropertyPhotoService $photoService): RedirectResponse
+    public function storePhoto(PropertyPhotoRequest $request, Property $property, PropertyPhotoService $photoService, PlanService $planService): RedirectResponse
     {
         Gate::authorize('update', $property);
 
         $files = array_values($request->file('photos', []));
-        $limit = (int) config('plans.free.limits.photos_per_property');
+        $limit = $planService->limit($request->user(), 'photos_per_property');
         $existing = $property->photos()->count();
 
-        if ($existing + count($files) > $limit) {
+        if ($limit !== null && $existing + count($files) > $limit) {
             return back()->withInput()->withErrors([
                 'photos' => "แพ็กเกจฟรีเก็บรูปได้สูงสุด {$limit} รูปต่อทรัพย์ รูปเดิมยังอยู่ครบ",
             ]);

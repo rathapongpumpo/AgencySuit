@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ClientRequest;
 use App\Models\Client;
+use App\Services\MatchingService;
+use App\Services\PlanService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -18,21 +20,22 @@ class ClientController extends Controller
         ]);
     }
 
-    public function create(Request $request): View
+    public function create(Request $request, PlanService $planService): View
     {
-        $limit = (int) config('plans.free.limits.clients');
+        $limit = $planService->limit($request->user(), 'clients');
+        $clientCount = $request->user()->clients()->count();
 
         return view('clients.create', [
             'limit' => $limit,
-            'limitReached' => $request->user()->clients()->count() >= $limit,
+            'limitReached' => $planService->reached($request->user(), 'clients', $clientCount),
         ]);
     }
 
-    public function store(ClientRequest $request): RedirectResponse
+    public function store(ClientRequest $request, PlanService $planService): RedirectResponse
     {
-        $limit = (int) config('plans.free.limits.clients');
+        $limit = $planService->limit($request->user(), 'clients');
 
-        if ($request->user()->clients()->count() >= $limit) {
+        if ($planService->reached($request->user(), 'clients', $request->user()->clients()->count())) {
             return to_route('clients.create')
                 ->withInput()
                 ->with('limit_reached', "แพ็กเกจฟรีเพิ่มลูกค้าได้สูงสุด {$limit} รายการ ข้อมูลเดิมยังอยู่ครบ");
@@ -43,11 +46,18 @@ class ClientController extends Controller
         return to_route('clients.show', $client)->with('success', 'บันทึกลูกค้าแล้ว');
     }
 
-    public function show(Client $client): View
+    public function show(Client $client, MatchingService $matchingService): View
     {
         Gate::authorize('view', $client);
+        $client->load([
+            'followUps' => fn ($query) => $query->latest('due_date'),
+            'deals' => fn ($query) => $query->latest(),
+        ]);
 
-        return view('clients.show', compact('client'));
+        return view('clients.show', [
+            'client' => $client,
+            'propertyMatches' => $matchingService->forClient($client),
+        ]);
     }
 
     public function edit(Client $client): View

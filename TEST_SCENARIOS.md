@@ -245,3 +245,29 @@ This document is owned by Tester and must evolve with the product.
 - Build/style evidence: `npm run build` PASS; `vendor\\bin\\pint --test` PASS; secret-pattern check PASS.
 - Developer Handoff file was not present in the repository; release decision is based on the actual working-tree diff and executed checks.
 - **Release decision: PASS — commit and push TEST-006.**
+
+## FINAL V1 RELEASE GATE — full regression (2026-09-17)
+
+| ID | Scope | Actual result | Result | Evidence |
+|---|---|---|---|---|
+| FINAL-AUTO-001 | Clean migration | `migrate:fresh --env=testing --force` completed all 11 migrations on Docker MySQL `agencysuit_test`. | PASS | Artisan migration output |
+| FINAL-AUTO-002 | Full automated suite | Full PHPUnit suite passed 74 tests / 360 assertions. | PASS | `php artisan test` |
+| FINAL-AUTO-003 | Build/style/diff | Vite build, Pint, and `git diff --check` all passed. | PASS | Command output |
+| FINAL-E2E-001 | Core loop | Register/login → property → 3 photos → client → Match 100% → one/multiple share fallback → follow-up presets/custom → Today → appointment → edit/cancel → deal stages → close → commission → feedback → logout/login → persisted property/client/deal. | PASS | Playwright browser flow |
+| FINAL-AUTH-001 | Authentication | Wrong password, password-reset request, logout/login, guest redirects, and Google callback/unconfigured mock paths handled without raw exception. | PASS | Browser smoke; `AuthenticationTest` |
+| FINAL-SEC-001 | Ownership/tampering | User B received 403 for User A property, client, appointment, and deal IDs; automated isolation covers follow-up/photo/matching paths. | PASS | Browser URL tampering; feature tests |
+| FINAL-MATCH-001 | Matching | Deterministic 0–100 scoring, price/location/type/bedroom/missing-field behavior, descending order, and cross-user exclusion passed. | PASS | `MatchingServiceTest`; `MatchingTest`; browser Match 100% |
+| FINAL-TODAY-001 | Follow-up/Today | Tomorrow/3-day/7-day/custom dates, overdue vs due-today ordering, and completion removal passed. | PASS | Browser flow; `FollowUpTest` |
+| FINAL-APPT-001 | Appointments | Create, edit, Today visibility, cancel, and ownership isolation passed. | PASS | Browser flow; `AppointmentTest` |
+| FINAL-DEAL-001 | Deal/commission | All stages through close, active-deal limit, percentage, co-agent split, rounding, invalid-value validation, and persistence passed. | PASS | Browser flow; `DealTest`; `CommissionServiceTest` |
+| FINAL-FEEDBACK-001 | Feedback | All 3 types, 300-character boundary, route metadata, automatic user association, and success state passed. | PASS | Browser flow; `FeedbackTest` |
+| FINAL-PLAN-001 | Free/Pro | Limits are centralized; Pro limits resolve to null/unlimited; upgrade screen explicitly says payment is not active and does not claim success. | PASS | `PlanServiceTest`; config/view inspection; browser `/upgrade` |
+| FINAL-MOBILE-001 | Mobile UX | Core screens checked at 360×800, 390×844, and 412×915: no horizontal overflow, bottom nav usable, short forms, cards/lists (no tables), and appointment CTA reachable after normal scroll. | PASS | Playwright viewport metrics and interaction |
+| FINAL-SECRET-001 | Secret/staged scope | No `.env`, credentials, production DB values, or debug dumps in the staged V1 diff. `.playwright-cli/` and `TASK-003-LEAN.md` excluded. | PASS | Staged diff scan |
+
+### Final V1 release-gate outcome
+
+- Environment: Docker `agencysuit-mysql-test` (`mysql:8.4`) on `127.0.0.1:3306/agencysuit_test`; production/shared DB was not used.
+- Developer Handoff file was not present in the repository; the gate used the actual diff, clean migration, automated suite, and browser evidence.
+- Non-blocking: local GD remains disabled; the previously verified safe original-file fallback remains valid, and production should verify GD at deploy. Real Google OAuth was not exercised because local OAuth credentials are intentionally unconfigured; callback failure/unconfigured paths passed.
+- **Release decision: PASS — commit and push the tracked V1 changes.**
