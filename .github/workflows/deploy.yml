@@ -119,10 +119,11 @@ jobs:
           rm -f "$release/storage"
           ln -s "$shared_storage" "$release/storage"
 
+          cd "$release"
           "$php_bin" "$composer_bin" install \
             --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-scripts
 
-          "$php_bin" "$release/artisan" package:discover --ansi
+          "$php_bin" artisan package:discover --ansi
 
           mkdir -p "$release/bootstrap/cache" "$shared_storage/app/private" \
             "$shared_storage/framework/cache" "$shared_storage/framework/sessions" \
@@ -134,7 +135,6 @@ jobs:
             "$php_bin" "$release/artisan" migrate --force --no-interaction
           fi
 
-          cd "$release"
           "$php_bin" artisan optimize:clear
           "$php_bin" artisan config:cache
           "$php_bin" artisan route:cache
