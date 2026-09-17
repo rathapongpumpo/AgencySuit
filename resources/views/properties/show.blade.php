@@ -12,6 +12,68 @@
     <h1 class="mt-4 text-2xl font-bold tracking-tight">{{ $property->name }}</h1>
     <p class="mt-2 text-sm text-stone-600">{{ $property->transaction_label }} · {{ $property->status_label }}</p>
 
+    @php($photoLimit = (int) config('plans.free.limits.photos_per_property'))
+    @php($photoErrors = collect($errors->messages())
+        ->filter(fn (array $messages, string $key): bool => $key === 'photos' || str_starts_with($key, 'photos.'))
+        ->flatten()
+        ->unique()
+        ->values()
+        ->all())
+    <section class="mt-6 border-y border-stone-200 bg-white px-4 py-4" aria-labelledby="photos-heading">
+        <div class="flex items-center justify-between gap-3">
+            <div>
+                <h2 id="photos-heading" class="text-base font-semibold">รูปทรัพย์</h2>
+                <p class="mt-1 text-xs text-stone-500">{{ $property->photos->count() }}/{{ $photoLimit }} รูป · รูปแรกเป็นภาพหลักอัตโนมัติ</p>
+            </div>
+        </div>
+
+        @if ($property->photos->isNotEmpty())
+            <div class="mt-4 grid grid-cols-3 gap-2" data-photo-grid>
+                @foreach ($property->photos as $photo)
+                    <figure class="min-w-0">
+                        <img src="{{ route('properties.photos.thumbnail', [$property, $photo]) }}" alt="รูป {{ $loop->iteration }} ของ {{ $property->name }}" class="aspect-square w-full rounded-lg object-cover" loading="lazy">
+                        <figcaption class="mt-1 space-y-1">
+                            @if ($photo->is_primary)
+                                <p class="text-[11px] font-semibold text-green-800">ภาพหลัก</p>
+                            @else
+                                <form method="POST" action="{{ route('properties.photos.primary', [$property, $photo]) }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="min-h-9 text-left text-xs font-semibold text-green-800 underline underline-offset-2">ตั้งเป็นภาพหลัก</button>
+                                </form>
+                            @endif
+                            <form method="POST" action="{{ route('properties.photos.destroy', [$property, $photo]) }}" onsubmit="return confirm('ลบรูปนี้หรือไม่?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="min-h-9 text-left text-xs font-medium text-red-700 underline underline-offset-2">ลบรูป</button>
+                            </form>
+                        </figcaption>
+                    </figure>
+                @endforeach
+            </div>
+        @endif
+
+        @if ($property->photos->count() < $photoLimit)
+            <form method="POST" action="{{ route('properties.photos.store', $property) }}" enctype="multipart/form-data" class="mt-5 space-y-3" data-photo-upload>
+                @csrf
+                <label for="photos" class="block text-sm font-medium text-stone-800">เพิ่มรูป</label>
+                <input id="photos" name="photos[]" type="file" accept="image/jpeg,image/png,image/webp" multiple data-photo-input class="block min-h-12 w-full rounded-xl border border-stone-300 bg-white px-3 py-3 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-stone-100 file:px-3 file:py-2 file:text-sm file:font-semibold">
+                <div class="grid grid-cols-3 gap-2" data-photo-preview aria-live="polite"></div>
+                @if ($photoErrors)
+                    <div role="alert" class="border-l-4 border-red-600 bg-red-50 px-3 py-3 text-sm text-red-800">
+                        @foreach ($photoErrors as $photoError)
+                            <p>{{ $photoError }}</p>
+                        @endforeach
+                    </div>
+                @endif
+                <p class="text-xs text-stone-500">JPG, PNG หรือ WebP · ไม่เกิน {{ (int) config('photos.max_upload_kb') / 1024 }} MB ต่อไฟล์</p>
+                <button type="submit" class="min-h-12 w-full rounded-xl bg-green-900 px-5 text-base font-semibold text-white">อัปโหลดรูป</button>
+            </form>
+        @else
+            <p class="mt-5 rounded-lg bg-stone-50 px-3 py-3 text-sm text-stone-700">ครบ {{ $photoLimit }} รูปแล้ว รูปเดิมยังอยู่ครบ ลบรูปที่ไม่ใช้ก่อนหากต้องการเพิ่มรูปใหม่</p>
+        @endif
+    </section>
+
     <dl class="mt-6 divide-y divide-stone-200 border-y border-stone-200 bg-white">
         <div class="flex min-h-14 items-center justify-between gap-4 px-4">
             <dt class="text-sm text-stone-600">ราคา</dt>

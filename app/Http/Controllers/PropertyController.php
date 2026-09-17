@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PropertyPhotoRequest;
 use App\Http\Requests\PropertyRequest;
 use App\Http\Requests\PropertyStatusRequest;
 use App\Models\Property;
+use App\Models\PropertyPhoto;
+use App\Services\PropertyPhotoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class PropertyController extends Controller
@@ -15,7 +19,7 @@ class PropertyController extends Controller
     public function index(Request $request): View
     {
         return view('properties.index', [
-            'properties' => $request->user()->properties()->latest()->get(),
+            'properties' => $request->user()->properties()->with(['photos', 'primaryPhoto'])->latest()->get(),
         ]);
     }
 
@@ -52,6 +56,7 @@ class PropertyController extends Controller
     public function show(Property $property): View
     {
         Gate::authorize('view', $property);
+        $property->load(['photos', 'primaryPhoto']);
 
         return view('properties.show', [
             'property' => $property,
@@ -80,5 +85,89 @@ class PropertyController extends Controller
         $property->update($request->validated());
 
         return to_route('properties.show', $property)->with('success', 'เปลี่ยนสถานะแล้ว');
+    }
+
+    public function storePhoto(PropertyPhotoRequest $request, Property $property, PropertyPhotoService $photoService): RedirectResponse
+    {
+        Gate::authorize('update', $property);
+
+        $files = array_values($request->file('photos', []));
+        $limit = (int) config('plans.free.limits.photos_per_property');
+        $existing = $property->photos()->count();
+
+        if ($existing + count($files) > $limit) {
+            return back()->withInput()->withErrors([
+                'photos' => "แพ็กเกจฟรีเก็บรูปได้สูงสุด {$limit} รูปต่อทรัพย์ รูปเดิมยังอยู่ครบ",
+            ]);
+        }
+
+        $photoService->storeMany(
+            $property,
+            $files,
+            $property->photos()->where('is_primary', true)->exists(),
+        );
+
+        return to_route('properties.show', $property)->with('success', 'เพิ่มรูปแล้ว');
+    }
+
+    public function setPrimaryPhoto(Property $property, PropertyPhoto $photo): RedirectResponse
+    {
+        Gate::authorize('update', $property);
+        $photo = $this->ownedPhoto($property, $photo);
+
+        $property->photos()->update(['is_primary' => false]);
+        $photo->update(['is_primary' => true]);
+
+        return to_route('properties.show', $property)->with('success', 'เปลี่ยนภาพหลักแล้ว');
+    }
+
+    public function destroyPhoto(Property $property, PropertyPhoto $photo): RedirectResponse
+    {
+        Gate::authorize('update', $property);
+        $photo = $this->ownedPhoto($property, $photo);
+        $wasPrimary = $photo->is_primary;
+
+        Storage::disk('local')->delete(array_filter([$photo->path, $photo->thumbnail_path]));
+        $photo->delete();
+
+        if ($wasPrimary) {
+            $property->photos()->where('is_primary', false)->orderBy('id')->first()?->update(['is_primary' => true]);
+        }
+
+        return to_route('properties.show', $property)->with('success', 'ลบรูปแล้ว');
+    }
+
+    public function showPhoto(Property $property, PropertyPhoto $photo): mixed
+    {
+        Gate::authorize('view', $property);
+        $photo = $this->ownedPhoto($property, $photo);
+
+        return $this->photoResponse($photo, $photo->path);
+    }
+
+    public function showPhotoThumbnail(Property $property, PropertyPhoto $photo): mixed
+    {
+        Gate::authorize('view', $property);
+        $photo = $this->ownedPhoto($property, $photo);
+
+        return $this->photoResponse($photo, $photo->thumbnail_path ?? $photo->path);
+    }
+
+    private function photoResponse(PropertyPhoto $photo, string $path): mixed
+    {
+
+        abort_unless(Storage::disk('local')->exists($path), 404);
+
+        return response()->file(Storage::disk('local')->path($path), [
+            'Content-Type' => $photo->mime_type,
+            'Cache-Control' => 'private, max-age=3600',
+        ]);
+    }
+
+    private function ownedPhoto(Property $property, PropertyPhoto $photo): PropertyPhoto
+    {
+        abort_unless($photo->property_id === $property->id && $photo->user_id === request()->user()->id, 404);
+
+        return $photo;
     }
 }

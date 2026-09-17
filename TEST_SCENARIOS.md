@@ -186,3 +186,40 @@ This document is owned by Tester and must evolve with the product.
 - Build/style evidence: `npm run build` PASS; `vendor\\bin\\pint --test` PASS.
 - Migration evidence: Docker `mysql:8.4` container `agencysuit-mysql-test` on `127.0.0.1:3306`; migration `2026_09_16_000004_create_properties_table` is Ran.
 - Developer Handoff file was not present in the repository; release decision is based on the actual working-tree diff and executed checks.
+
+## TEST-005 — Property Images execution (2026-09-17)
+
+| ID | Scope | Actual result | Result | Severity / Evidence |
+|---|---|---|---|---|
+| IMG-001 | Primary image and thumbnail ordering | Uploading JPG + PNG + WebP stores the first file as `is_primary=true`, but the detail relation has no explicit ordering. The UI displayed the third uploaded image as “ภาพหลัก”; list/detail selection can therefore use a non-primary image. | FAIL | Sev-2; browser detail `/properties/25` showed “ภาพหลัก” on รูป 3 while DB primary was photo id 13; `Property` photo queries have no `ORDER BY`. |
+| IMG-002 | Invalid/corrupt/oversized feedback | Corrupt image and >4 MB image were rejected and existing photos remained intact, but the detail page displayed no actionable validation message after the redirect. | FAIL | Sev-3; browser upload attempts on `/properties/26` showed 0/3 with no error text. |
+| IMG-003 | Valid formats and GD fallback | Real JPG/PNG/WebP upload succeeded with GD disabled; no fatal occurred, metadata/path were stored, and `thumbnail_path` remained null rather than claiming a generated thumbnail. | PASS | PHP `gd=off`; DB/storage inspection; browser preview. |
+| IMG-004 | Limit and data retention | Automated test blocks the fourth photo from centralized free limit 3 while retaining existing records. | PASS | `PropertyPhotoTest`. |
+| IMG-005 | Isolation/private storage | User isolation tests pass; photo rows contain metadata/path only and files are under `storage/app/private/properties/{user}/{property}`. | PASS | `PropertyPhotoTest`; migration/config inspection. |
+| MOB-IMG-001 | Mobile image UI | 360×800, 390×844, and 412×915 showed no horizontal overflow; upload/preview controls fit the viewport. | PASS | Playwright viewport metrics and snapshots. |
+| ENV-IMG-001 | PHP temp upload | `php artisan serve` could not create upload temp files in this local environment. With a writable `upload_tmp_dir`/`sys_temp_dir`, the same app upload succeeded; classified as local environment-only and non-blocking. | PASS (non-blocking) | Direct PHP server with writable temp directory; no application change made. |
+
+### TEST-005 release-gate outcome
+
+- Scope: TASK-005 Property Images plus Property and Authentication/App Shell regression; full product regression was not run.
+- Automated evidence: `php artisan test tests/Feature/PropertyPhotoTest.php tests/Feature/PropertyTest.php tests/Feature/AuthenticationTest.php tests/Feature/MobileAppShellTest.php` passed 32 tests / 176 assertions on local Docker MySQL `agencysuit_test`.
+- Build/style evidence: `npm run build` PASS; `vendor\\bin\\pint --test` PASS; secret-pattern check PASS.
+- GD note: local PHP has GD disabled; safe original-file fallback passed. Production deployment should verify GD availability before expecting generated thumbnails.
+- Developer Handoff file was not present in the repository; decision is based on the actual working-tree diff and executed checks.
+- **Release decision: FAIL — do not commit or push. Return IMG-001 and IMG-002 to Developer.**
+
+## RETEST TEST-005 — Property Images (2026-09-17)
+
+| ID | Scope | Actual result | Result | Evidence |
+|---|---|---|---|---|
+| IMG-001-R | Primary/order consistency | Three real JPG/PNG/WebP uploads put the first photo first and primary after upload and reload. List and detail used the same primary; changing primary reordered both; deleting it selected the oldest remaining photo deterministically. | PASS | Browser flow; DB `is_primary`; list/detail thumbnail URLs. |
+| IMG-002-R | Validation/error feedback | Corrupt JPEG, invalid MIME, and >4 MB uploads were rejected with clear alert text beside the uploader; existing photos remained intact. | PASS | Browser flow at local test DB; 2/3 count preserved after failures. |
+| IMG-003-R | Mobile error state | Uploader/error state measured with no horizontal overflow at 360×800, 390×844, and 412×915. | PASS | Playwright viewport metrics. |
+
+### RETEST TEST-005 release-gate outcome
+
+- Automated evidence: `php artisan test tests/Feature/PropertyPhotoTest.php tests/Feature/PropertyTest.php tests/Feature/AuthenticationTest.php tests/Feature/MobileAppShellTest.php` passed 35 tests / 192 assertions on local Docker MySQL `agencysuit_test`.
+- Build/style evidence: `npm run build` PASS; `vendor\\bin\\pint --test` PASS; secret-pattern check PASS.
+- GD remains disabled locally; original-file fallback is safe, with `thumbnail_path` null and private storage paths under the user/property directory. Production should verify GD at deploy.
+- PHP temp-upload issue remains local-environment-only; testing used a writable temp directory without changing application behavior.
+- Full regression was not run. **Release decision: PASS.**

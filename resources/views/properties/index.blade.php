@@ -17,12 +17,22 @@
                 @foreach ($properties as $property)
                     <li>
                         <a href="{{ route('properties.show', $property) }}" class="block py-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700">
-                            <div class="flex items-start justify-between gap-4">
-                                <h3 class="text-base font-semibold">{{ $property->name }}</h3>
-                                <span class="shrink-0 text-sm font-medium text-green-800">{{ $property->status_label }}</span>
+                            @php($primaryPhoto = $property->primaryPhoto ?? $property->photos->first())
+                            <div class="flex items-start gap-3">
+                                @if ($primaryPhoto)
+                                    <img src="{{ route('properties.photos.thumbnail', [$property, $primaryPhoto]) }}" alt="" class="mt-0.5 h-16 w-16 shrink-0 rounded-lg object-cover" loading="lazy">
+                                @else
+                                    <div class="mt-0.5 flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border border-stone-200 bg-stone-100 text-[11px] font-medium text-stone-500">ยังไม่มีรูป</div>
+                                @endif
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <h3 class="text-base font-semibold">{{ $property->name }}</h3>
+                                        <span class="shrink-0 text-sm font-medium text-green-800">{{ $property->status_label }}</span>
+                                    </div>
+                                    <p class="mt-1 text-sm text-stone-600">{{ $property->transaction_label }} · {{ $property->formattedPrice() }}</p>
+                                    <p class="mt-1 text-sm text-stone-600">{{ $property->bedrooms }} ห้องนอน · {{ $property->location }}</p>
+                                </div>
                             </div>
-                            <p class="mt-1 text-sm text-stone-600">{{ $property->transaction_label }} · {{ $property->formattedPrice() }}</p>
-                            <p class="mt-1 text-sm text-stone-600">{{ $property->bedrooms }} ห้องนอน · {{ $property->location }}</p>
                         </a>
                     </li>
                 @endforeach

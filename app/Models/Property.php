@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable(['user_id', 'transaction_type', 'name', 'price', 'bedrooms', 'location', 'status'])]
 class Property extends Model
@@ -28,6 +30,20 @@ class Property extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function photos(): HasMany
+    {
+        return $this->hasMany(PropertyPhoto::class)
+            ->orderByDesc('is_primary')
+            ->orderBy('id');
+    }
+
+    public function primaryPhoto(): HasOne
+    {
+        return $this->hasOne(PropertyPhoto::class)
+            ->where('is_primary', true)
+            ->orderBy('id');
     }
 
     protected function transactionLabel(): Attribute

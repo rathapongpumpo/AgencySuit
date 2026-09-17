@@ -27,3 +27,30 @@ quickAddSheet?.addEventListener('click', (event) => {
         quickAddSheet.close();
     }
 });
+
+document.querySelectorAll('[data-photo-input]').forEach((input) => {
+    const preview = input.closest('[data-photo-upload]')?.querySelector('[data-photo-preview]');
+
+    input.addEventListener('change', () => {
+        if (!preview) {
+            return;
+        }
+
+        preview.replaceChildren();
+        Array.from(input.files ?? []).forEach((file) => {
+            if (!file.type.startsWith('image/')) {
+                return;
+            }
+
+            const image = document.createElement('img');
+            image.className = 'aspect-square w-full rounded-lg border border-stone-200 object-cover';
+            image.alt = `ตัวอย่าง ${file.name}`;
+            image.file = file;
+            preview.append(image);
+
+            const reader = new FileReader();
+            reader.addEventListener('load', () => { image.src = reader.result; });
+            reader.readAsDataURL(file);
+        });
+    });
+});

@@ -28,6 +28,11 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/properties', [PropertyController::class, 'index'])->name('properties.index');
     Route::get('/properties/create', [PropertyController::class, 'create'])->name('properties.create');
     Route::post('/properties', [PropertyController::class, 'store'])->name('properties.store');
+    Route::post('/properties/{property}/photos', [PropertyController::class, 'storePhoto'])->name('properties.photos.store');
+    Route::patch('/properties/{property}/photos/{photo}/primary', [PropertyController::class, 'setPrimaryPhoto'])->name('properties.photos.primary');
+    Route::delete('/properties/{property}/photos/{photo}', [PropertyController::class, 'destroyPhoto'])->name('properties.photos.destroy');
+    Route::get('/properties/{property}/photos/{photo}/file', [PropertyController::class, 'showPhoto'])->name('properties.photos.file');
+    Route::get('/properties/{property}/photos/{photo}/thumbnail', [PropertyController::class, 'showPhotoThumbnail'])->name('properties.photos.thumbnail');
     Route::get('/properties/{property}', [PropertyController::class, 'show'])->name('properties.show');
     Route::get('/properties/{property}/edit', [PropertyController::class, 'edit'])->name('properties.edit');
     Route::put('/properties/{property}', [PropertyController::class, 'update'])->name('properties.update');
