@@ -60,7 +60,7 @@ jobs:
         run: |
           set -euo pipefail
           for required in HOST SSH_PORT SSH_USER SSH_PRIVATE_KEY REMOTE_BASE PUBLIC_PATH; do
-            if [ -z "${!required}" ]; then
+            if [ -z "${!required:-}" ]; then
               echo "::error title=Missing deploy setting::${required} is empty. Configure the corresponding GitHub Actions secret."
               exit 1
             fi
@@ -68,7 +68,25 @@ jobs:
           mkdir -p "$HOME/.ssh"
           printf '%s\n' "$SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
           chmod 600 "$HOME/.ssh/id_ed25519"
-          ssh-keyscan -H -p "$SSH_PORT" "$HOST" >> "$HOME/.ssh/known_hosts"
+          scan_file="$HOME/.ssh/known_hosts"
+          scan_tmp="$HOME/.ssh/known_hosts.tmp"
+          for attempt in 1 2 3 4 5; do
+            if ssh-keyscan -T 10 -H -p "$SSH_PORT" "$HOST" > "$scan_tmp" 2>/dev/null && [ -s "$scan_tmp" ]; then
+              cat "$scan_tmp" >> "$scan_file"
+              rm -f "$scan_tmp"
+              break
+            fi
+            rm -f "$scan_tmp"
+            if [ "$attempt" = 5 ]; then
+              echo "::error title=Hostinger SSH scan failed::Could not read an SSH host key from $HOST:$SSH_PORT after 5 attempts."
+              exit 1
+            fi
+            sleep 2
+          done
+          if ! ssh -p "$SSH_PORT" -o BatchMode=yes -o ConnectTimeout=10 "$SSH_USER@$HOST" "true"; then
+            echo "::error title=Hostinger SSH authentication failed::Check SSH_PRIVATE_KEY, SSH_USER, HOST, and SSH_PORT GitHub settings."
+            exit 1
+          fi
 
       - name: Deploy release
         env:
