@@ -37,3 +37,7 @@ Important:
 5. Run `npm run build` for the frontend bundle.
 
 Automated tests must never use the production/shared database (`194.59.164.72` / `propagent`). The database safety guard aborts tests and destructive commands when those values are configured.
+
+## Release flow
+
+Routine code changes are pushed to GitHub. Hostinger website deployment is performed separately; apply a Hostinger migration only when a release includes new database migrations.
