@@ -17,9 +17,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      HOST: ${{ secrets.HOST }}
-      SSH_PORT: ${{ secrets.SSH_PORT }}
-      SSH_USER: ${{ secrets.SSH_USER }}
+      HOST: ${{ secrets.HOST || '156.67.222.250' }}
+      SSH_PORT: ${{ secrets.SSH_PORT || '65002' }}
+      SSH_USER: ${{ secrets.SSH_USER || 'u271733843' }}
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       REMOTE_BASE: ${{ secrets.REMOTE_BASE || '/home/u271733843/agencysuit' }}
       PUBLIC_PATH: ${{ secrets.PUBLIC_PATH || '/home/u271733843/domains/darkgray-duck-178765.hostingersite.com/public_html' }}
@@ -59,12 +59,12 @@ jobs:
       - name: Setup SSH
         run: |
           set -euo pipefail
-          test -n "$HOST"
-          test -n "$SSH_PORT"
-          test -n "$SSH_USER"
-          test -n "$SSH_PRIVATE_KEY"
-          test -n "$REMOTE_BASE"
-          test -n "$PUBLIC_PATH"
+          for required in HOST SSH_PORT SSH_USER SSH_PRIVATE_KEY REMOTE_BASE PUBLIC_PATH; do
+            if [ -z "${!required}" ]; then
+              echo "::error title=Missing deploy setting::${required} is empty. Configure the corresponding GitHub Actions secret."
+              exit 1
+            fi
+          done
           mkdir -p "$HOME/.ssh"
           printf '%s\n' "$SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
           chmod 600 "$HOME/.ssh/id_ed25519"
