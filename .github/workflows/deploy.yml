@@ -105,9 +105,6 @@ jobs:
           release="$3"
           migrations_changed="$4"
           release_id="$(basename "$release")"
-          deploy_log="$remote_base/deploy-$(basename "$release").log"
-          exec >"$deploy_log" 2>&1
-          set -x
           shared_env="$remote_base/shared/.env"
           shared_storage="$remote_base/shared/storage"
           php_bin="/opt/alt/php84/usr/bin/php"
@@ -160,5 +157,4 @@ jobs:
             mv "$public_path" "${public_path}.legacy-${release_id}"
           fi
           ln -s "$remote_base/current/public" "$public_path"
-          rm -f "$deploy_log"
           REMOTE
