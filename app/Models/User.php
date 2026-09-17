@@ -23,6 +23,11 @@ class User extends Authenticatable
         return $this->hasMany(Property::class);
     }
 
+    public function clients(): HasMany
+    {
+        return $this->hasMany(Client::class);
+    }
+
     /**
      * Get the attributes that should be cast.
      *

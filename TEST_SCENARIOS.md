@@ -223,3 +223,25 @@ This document is owned by Tester and must evolve with the product.
 - GD remains disabled locally; original-file fallback is safe, with `thumbnail_path` null and private storage paths under the user/property directory. Production should verify GD at deploy.
 - PHP temp-upload issue remains local-environment-only; testing used a writable temp directory without changing application behavior.
 - Full regression was not run. **Release decision: PASS.**
+
+## TEST-006 — Client Core execution (2026-09-17)
+
+| ID | Scope | Actual result | Result | Severity / Evidence |
+|---|---|---|---|---|
+| CLI-001 | Quick Add → client | Quick Add exposes เพิ่มลูกค้า and opens `/clients/create`; the form presents four logical core fields before optional details. | PASS | Browser smoke; `ClientTest`; `MobileAppShellTest` |
+| CLI-002 | Minimum create + validation | Name, buy/rent, budget, and location create a client; browser required-field validation and server validation reject incomplete/invalid input without creating a record. | PASS | Browser validity check; `ClientTest` |
+| CLI-003 | List/detail/edit | Authenticated owner can list, open detail, edit core fields, and save optional contact/matching fields with success feedback. | PASS | Browser smoke; `ClientTest` |
+| CLI-004 | Guest protection + isolation | Guests are redirected to login; a second user receives 403 for the owner's client and cannot access it through the client route. | PASS | Browser smoke; `ClientTest` |
+| PLAN-CLI-001/002 | Free limit 5 and retention | Limit is sourced from centralized `config/plans.php`; sixth client is blocked with a clear message while existing records remain. | PASS | `ClientTest`; browser limit state; config inspection |
+| CLI-005 | Matching-ready schema | Client migration/model persist transaction type, budget, locations, bedrooms, minimum size, transit preference, and notes; no matching logic or extra feature was introduced. | PASS | Migration/model/route inspection |
+| MOB-CLI-001/002/003/004/006 | Mobile and progressive disclosure | Client create/list/detail render at 360×800, 390×844, and 412×915 with no horizontal overflow; create keeps optional fields collapsed and avoids table/admin UI. | PASS | Playwright viewport metrics/snapshots; UX/UI review |
+| SEC-CLI-001 | Secret + DB safety | Tests and migration ran only against Docker `agencysuit-mysql-test` (`mysql:8.4`, `127.0.0.1:3306/agencysuit_test`); no secrets staged. | PASS | Docker status; `.env.testing`; staged review |
+
+### TEST-006 release-gate outcome
+
+- Scope: TASK-006 Client Core plus Authentication/App Shell regression only; full product regression was not run.
+- Automated evidence: `php artisan test tests/Feature/ClientTest.php tests/Feature/AuthenticationTest.php tests/Feature/MobileAppShellTest.php` passed **24 tests / 141 assertions** on local Docker MySQL `agencysuit_test`.
+- Migration evidence: `2026_09_17_000006_create_clients_table` is Ran on the test database.
+- Build/style evidence: `npm run build` PASS; `vendor\\bin\\pint --test` PASS; secret-pattern check PASS.
+- Developer Handoff file was not present in the repository; release decision is based on the actual working-tree diff and executed checks.
+- **Release decision: PASS — commit and push TEST-006.**

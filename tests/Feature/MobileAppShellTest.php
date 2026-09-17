@@ -27,6 +27,7 @@ class MobileAppShellTest extends TestCase
             ->assertSee('เพิ่มรายการแรก')
             ->assertSee('เพิ่มทรัพย์')
             ->assertSee('เพิ่มลูกค้า')
+            ->assertSee(route('clients.create'), false)
             ->assertSee('นัดดู')
             ->assertSee('ติดตาม');
 

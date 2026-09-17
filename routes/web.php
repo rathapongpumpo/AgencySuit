@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\GoogleOAuthController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\PropertyController;
 use Illuminate\Support\Facades\Route;
 
@@ -37,7 +38,12 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/properties/{property}/edit', [PropertyController::class, 'edit'])->name('properties.edit');
     Route::put('/properties/{property}', [PropertyController::class, 'update'])->name('properties.update');
     Route::patch('/properties/{property}/status', [PropertyController::class, 'updateStatus'])->name('properties.status.update');
-    Route::view('/clients', 'clients.index')->name('clients.index');
+    Route::get('/clients', [ClientController::class, 'index'])->name('clients.index');
+    Route::get('/clients/create', [ClientController::class, 'create'])->name('clients.create');
+    Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
+    Route::get('/clients/{client}', [ClientController::class, 'show'])->name('clients.show');
+    Route::get('/clients/{client}/edit', [ClientController::class, 'edit'])->name('clients.edit');
+    Route::put('/clients/{client}', [ClientController::class, 'update'])->name('clients.update');
     Route::view('/more', 'more')->name('more');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });

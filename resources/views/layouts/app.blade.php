@@ -20,7 +20,7 @@
             </main>
         </div>
 
-        @unless (request()->routeIs('properties.create', 'properties.edit'))
+        @unless (request()->routeIs('properties.create', 'properties.edit', 'clients.create', 'clients.edit'))
             <button type="button" data-quick-add-open aria-haspopup="dialog" aria-controls="quick-add-sheet" class="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 z-20 flex size-13 items-center justify-center rounded-full bg-green-900 text-3xl font-light leading-none text-white shadow-lg shadow-green-950/20" aria-label="เพิ่มรายการ">+</button>
         @endunless
 
@@ -42,12 +42,14 @@
                     @foreach (['เพิ่มทรัพย์', 'เพิ่มลูกค้า', 'นัดดู', 'ติดตาม'] as $action)
                         @if ($action === 'เพิ่มทรัพย์')
                             <a href="{{ route('properties.create') }}" class="flex min-h-13 items-center px-4 text-base font-medium text-stone-700">{{ $action }}</a>
+                        @elseif ($action === 'เพิ่มลูกค้า')
+                            <a href="{{ route('clients.create') }}" class="flex min-h-13 items-center px-4 text-base font-medium text-stone-700">{{ $action }}</a>
                         @else
                             <span class="flex min-h-13 items-center px-4 text-base font-medium text-stone-700">{{ $action }}</span>
                         @endif
                     @endforeach
                 </div>
-                <p class="mt-3 text-sm text-stone-500">ฟอร์มเพิ่มข้อมูลจะพร้อมในขั้นตอนถัดไป</p>
+                <p class="mt-3 text-sm text-stone-500">เริ่มจากข้อมูลหลักก่อน แล้วเติมรายละเอียดภายหลังได้</p>
             </section>
         </dialog>
     </body>
