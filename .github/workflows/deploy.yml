@@ -3,27 +3,150 @@ name: Deploy to Hostinger
 on:
   push:
     branches:
-      - main
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: hostinger-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      HOST: ${{ secrets.HOST }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      REMOTE_BASE: ${{ secrets.REMOTE_BASE || secrets.REMOTE_PATH || '/home/u271733843/agencysuit' }}
+      PUBLIC_PATH: ${{ secrets.PUBLIC_PATH || '/home/u271733843/domains/darkgray-duck-178765.hostingersite.com/public_html' }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Build frontend assets
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run build
+
+      - name: Detect migration changes
+        id: migrations
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          if [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          elif git diff --quiet "$BEFORE_SHA" "$GITHUB_SHA" -- database/migrations; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Setup SSH
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -p "${{ secrets.SSH_PORT }}" "${{ secrets.HOST }}" >> ~/.ssh/known_hosts
+          set -euo pipefail
+          test -n "$HOST"
+          test -n "$SSH_PORT"
+          test -n "$SSH_USER"
+          test -n "$SSH_PRIVATE_KEY"
+          test -n "$REMOTE_BASE"
+          test -n "$PUBLIC_PATH"
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "$SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          ssh-keyscan -H -p "$SSH_PORT" "$HOST" >> "$HOME/.ssh/known_hosts"
 
-      - name: Deploy
+      - name: Deploy release
+        env:
+          MIGRATIONS_CHANGED: ${{ steps.migrations.outputs.changed }}
         run: |
-          rsync -az \
-            --exclude ".git/" \
-            --exclude ".github/" \
-            -e "ssh -p ${{ secrets.SSH_PORT }}" \
-            ./ "${{ secrets.SSH_USER }}@${{ secrets.HOST }}:${{ secrets.REMOTE_PATH }}/"
+          set -euo pipefail
+          release="${REMOTE_BASE%/}/releases/${GITHUB_SHA}"
+          ssh -p "$SSH_PORT" -o BatchMode=yes "$SSH_USER@$HOST" \
+            "mkdir -p '$REMOTE_BASE/releases' '$REMOTE_BASE/shared' '$release'"
+
+          rsync -az --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            --exclude='node_modules/' \
+            --exclude='vendor/' \
+            --exclude='.playwright-cli/' \
+            --exclude='TASK-003-LEAN.md' \
+            -e "ssh -p $SSH_PORT -o BatchMode=yes" \
+            ./ "$SSH_USER@$HOST:$release/"
+
+          ssh -p "$SSH_PORT" -o BatchMode=yes "$SSH_USER@$HOST" \
+            "bash -s -- '$REMOTE_BASE' '$PUBLIC_PATH' '$release' '$MIGRATIONS_CHANGED'" <<'REMOTE'
+          set -euo pipefail
+
+          remote_base="$1"
+          public_path="$2"
+          release="$3"
+          migrations_changed="$4"
+          shared_env="$remote_base/shared/.env"
+          shared_storage="$remote_base/shared/storage"
+          php_bin="/opt/alt/php84/usr/bin/php"
+          composer_bin="/usr/local/bin/composer"
+
+          test -f "$shared_env"
+          test -f "$release/composer.lock"
+          test -x "$php_bin"
+          test -x "$composer_bin"
+
+          rm -f "$release/.env"
+          ln -s "$shared_env" "$release/.env"
+
+          mkdir -p "$shared_storage"
+          if [ -d "$release/storage" ] && [ ! -L "$release/storage" ]; then
+            mv "$release/storage" "$release/storage.skeleton"
+          fi
+          rm -f "$release/storage"
+          ln -s "$shared_storage" "$release/storage"
+
+          "$php_bin" "$composer_bin" install \
+            --no-dev --prefer-dist --optimize-autoloader --no-interaction
+
+          mkdir -p "$release/bootstrap/cache" "$shared_storage/app/private" \
+            "$shared_storage/framework/cache" "$shared_storage/framework/sessions" \
+            "$shared_storage/framework/views" "$shared_storage/logs"
+          chmod -R ug+rwX "$release/bootstrap/cache" "$shared_storage"
+          chmod 640 "$shared_env"
+
+          if [ "$migrations_changed" = "true" ]; then
+            "$php_bin" "$release/artisan" migrate --force --no-interaction
+          fi
+
+          cd "$release"
+          "$php_bin" artisan optimize:clear
+          "$php_bin" artisan config:cache
+          "$php_bin" artisan route:cache
+          "$php_bin" artisan view:cache
+
+          current_next="$remote_base/current.next"
+          rm -f "$current_next"
+          ln -s "$release" "$current_next"
+          mv -Tf "$current_next" "$remote_base/current"
+
+          if [ -L "$public_path" ]; then
+            rm "$public_path"
+          elif [ -e "$public_path" ]; then
+            mv "$public_path" "${public_path}.legacy-${GITHUB_SHA}"
+          fi
+          ln -s "$remote_base/current/public" "$public_path"
+          REMOTE
