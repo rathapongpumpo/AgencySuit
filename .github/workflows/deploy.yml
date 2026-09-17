@@ -100,6 +100,7 @@ jobs:
           public_path="$2"
           release="$3"
           migrations_changed="$4"
+          release_id="$(basename "$release")"
           deploy_log="$remote_base/deploy-$(basename "$release").log"
           exec >"$deploy_log" 2>&1
           set -x
@@ -152,7 +153,7 @@ jobs:
           if [ -L "$public_path" ]; then
             rm "$public_path"
           elif [ -e "$public_path" ]; then
-            mv "$public_path" "${public_path}.legacy-${GITHUB_SHA}"
+            mv "$public_path" "${public_path}.legacy-${release_id}"
           fi
           ln -s "$remote_base/current/public" "$public_path"
           rm -f "$deploy_log"
