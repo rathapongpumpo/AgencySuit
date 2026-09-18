@@ -3,18 +3,34 @@
 @section('title', 'เพิ่มเติม | AgencySuit')
 
 @section('content')
-    <p class="text-sm font-semibold text-green-800">เพิ่มเติม</p>
-    <h1 class="mt-2 text-2xl font-bold tracking-tight">การตั้งค่า</h1>
-
-    <section class="mt-6 divide-y divide-stone-200 border-y border-stone-200 bg-white">
-        <div class="flex min-h-15 items-center justify-between gap-4 px-4">
-            <div><h2 class="font-medium">บัญชีผู้ใช้</h2><p class="mt-0.5 text-sm text-stone-600">{{ auth()->user()->email }}</p></div>
+    <div class="as-page-head">
+        <div>
+            <h1 class="as-page-title">เพิ่มเติม</h1>
+            <p class="as-page-subtitle">บัญชีและการใช้งานของคุณ</p>
         </div>
-        <a href="{{ route('upgrade') }}" class="flex min-h-15 items-center justify-between gap-4 px-4"><span class="font-medium">แผนการใช้งาน</span><span class="text-sm text-stone-600">{{ strtoupper(auth()->user()->plan) }}</span></a>
-        <a href="{{ route('feedback.create') }}" class="flex min-h-15 items-center justify-between gap-4 px-4"><span class="font-medium">ส่งความคิดเห็น</span><span class="text-sm text-stone-600">ส่งได้ทันที</span></a>
-        <form method="POST" action="{{ route('logout') }}" class="px-4 py-2">
+    </div>
+
+    <section class="as-setting-list">
+        <div class="as-setting-row">
+            <span class="as-icon-box"><x-icon name="users" size="19" /></span>
+            <span class="min-w-0 flex-1">
+                <span class="as-setting-label block">บัญชีผู้ใช้</span>
+                <span class="as-setting-meta block truncate">{{ auth()->user()->email }}</span>
+            </span>
+        </div>
+        <a href="{{ route('upgrade') }}" class="as-setting-row">
+            <span class="as-icon-box"><x-icon name="building" size="19" /></span>
+            <span class="min-w-0 flex-1"><span class="as-setting-label block">แผนการใช้งาน</span><span class="as-setting-meta block">ดูสิทธิ์และทางเลือกเพิ่มเติม</span></span>
+            <span class="as-setting-value">{{ strtoupper(auth()->user()->plan) }} <x-icon name="chevron-right" size="17" class="ml-1 inline" /></span>
+        </a>
+        <a href="{{ route('feedback.create') }}" class="as-setting-row">
+            <span class="as-icon-box"><x-icon name="check" size="19" /></span>
+            <span class="min-w-0 flex-1"><span class="as-setting-label block">ส่งความคิดเห็น</span><span class="as-setting-meta block">บอกสิ่งที่ควรทำให้ง่ายขึ้น</span></span>
+            <x-icon name="chevron-right" size="17" class="text-stone-400" />
+        </a>
+        <form method="POST" action="{{ route('logout') }}" class="border-t border-stone-200 px-4 py-2">
             @csrf
-            <button type="submit" class="min-h-11 text-sm font-semibold text-red-700">ออกจากระบบ</button>
+            <button type="submit" class="min-h-11 text-sm font-bold text-red-700">ออกจากระบบ</button>
         </form>
     </section>
 @endsection

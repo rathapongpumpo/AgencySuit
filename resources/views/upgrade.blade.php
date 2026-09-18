@@ -3,12 +3,19 @@
 @section('title', 'แผนการใช้งาน | AgencySuit')
 
 @section('content')
-    <a href="{{ route('more') }}" class="inline-flex min-h-11 items-center text-sm font-semibold text-green-800">← เพิ่มเติม</a>
-    <p class="mt-4 text-sm font-semibold text-green-800">แผนการใช้งาน</p>
-    <h1 class="mt-2 text-2xl font-bold tracking-tight">Agent Pocket Pro</h1>
-    <p class="mt-2 text-sm leading-6 text-stone-600">ซื้อครั้งเดียว ปลดข้อจำกัด Free เมื่อระบบชำระเงินพร้อมใช้งาน</p>
-    <section class="mt-6 border-y border-stone-200 bg-white px-4 py-4">
-        <p class="text-base font-semibold">แผนปัจจุบัน: {{ strtoupper(auth()->user()->plan) }}</p>
-        <p class="mt-2 text-sm leading-6 text-stone-600">หน้านี้เป็น placeholder สำหรับต่อ payment ภายหลัง ยังไม่มีการเรียกเก็บเงินจริง</p>
+    <a href="{{ route('more') }}" class="as-back-link"><x-icon name="chevron-right" size="18" class="rotate-180" />เพิ่มเติม</a>
+    <div class="as-detail-hero">
+        <h1 class="as-detail-title">Agent Pocket Pro</h1>
+        <p class="as-page-subtitle">ซื้อครั้งเดียว ปลดข้อจำกัด Free เมื่อระบบชำระเงินพร้อมใช้งาน</p>
+    </div>
+    <section class="as-surface overflow-hidden">
+        <div class="px-4 py-5">
+            <p class="text-base font-bold">แผนปัจจุบัน: {{ strtoupper(auth()->user()->plan) }}</p>
+            <p class="mt-2 text-sm leading-6 text-stone-600">หน้านี้เป็น placeholder สำหรับต่อ payment ภายหลัง ยังไม่มีการเรียกเก็บเงินจริง</p>
+        </div>
+        <div class="border-t border-stone-200 px-4 py-4">
+            <p class="text-sm font-bold text-teal-900">สิ่งที่จะต่อยอดใน Pro</p>
+            <p class="mt-1 text-sm leading-6 text-stone-600">พื้นที่เก็บข้อมูลและประวัติที่มากขึ้น โดยไม่ปิดกั้น workflow หลักของคุณ</p>
+        </div>
     </section>
 @endsection

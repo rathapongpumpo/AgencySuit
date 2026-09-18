@@ -3,40 +3,47 @@
 @section('title', 'ทรัพย์ | AgencySuit')
 
 @section('content')
-    <p class="text-sm font-semibold text-green-800">ทรัพย์</p>
     @if ($properties->isEmpty())
-        <h1 class="mt-2 text-2xl font-bold tracking-tight">ยังไม่มีทรัพย์ในระบบ</h1>
-        <x-empty-state title="เพิ่มทรัพย์แรก" description="บันทึกทรัพย์ที่ดูแลไว้ เพื่อให้พร้อมจับคู่และติดตามลูกค้าในขั้นตอนถัดไป" action="เพิ่มทรัพย์" :action-url="route('properties.create')" />
-    @else
-        <h1 class="mt-2 text-2xl font-bold tracking-tight">ทรัพย์ของคุณ</h1>
-        <div class="mt-6">
-            <div class="flex items-center justify-between gap-4 border-b border-stone-200 pb-3">
-                <a href="{{ route('properties.create') }}" class="inline-flex min-h-11 items-center rounded-lg bg-green-900 px-4 text-sm font-semibold text-white">เพิ่มทรัพย์</a>
+        <div class="as-page-head">
+            <div>
+                <h1 class="as-page-title">ทรัพย์</h1>
+                <p class="as-page-subtitle">เริ่มจากทรัพย์ที่คุณกำลังดูแล</p>
             </div>
-            <ul class="divide-y divide-stone-200">
-                @foreach ($properties as $property)
-                    <li>
-                        <a href="{{ route('properties.show', $property) }}" class="block py-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700">
-                            @php($primaryPhoto = $property->primaryPhoto ?? $property->photos->first())
-                            <div class="flex items-start gap-3">
-                                @if ($primaryPhoto)
-                                    <img src="{{ route('properties.photos.thumbnail', [$property, $primaryPhoto]) }}" alt="" class="mt-0.5 h-16 w-16 shrink-0 rounded-lg object-cover" loading="lazy">
-                                @else
-                                    <div class="mt-0.5 flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border border-stone-200 bg-stone-100 text-[11px] font-medium text-stone-500">ยังไม่มีรูป</div>
-                                @endif
-                                <div class="min-w-0 flex-1">
-                                    <div class="flex items-start justify-between gap-3">
-                                        <h3 class="text-base font-semibold">{{ $property->name }}</h3>
-                                        <span class="shrink-0 text-sm font-medium text-green-800">{{ $property->status_label }}</span>
-                                    </div>
-                                    <p class="mt-1 text-sm text-stone-600">{{ $property->transaction_label }} · {{ $property->formattedPrice() }}</p>
-                                    <p class="mt-1 text-sm text-stone-600">{{ $property->bedrooms }} ห้องนอน · {{ $property->location }}</p>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                @endforeach
-            </ul>
         </div>
+        <div class="as-surface overflow-hidden">
+            <x-empty-state title="ยังไม่มีทรัพย์ในระบบ" description="เพิ่มทรัพย์แรก เพื่อให้พร้อมจับคู่และติดตามลูกค้าในขั้นตอนถัดไป" action="เพิ่มทรัพย์" :action-url="route('properties.create')" />
+        </div>
+    @else
+        <div class="as-page-head">
+            <div>
+                <h1 class="as-page-title">ทรัพย์ของคุณ</h1>
+                <p class="as-page-subtitle">{{ $properties->count() }} รายการที่กำลังดูแล</p>
+            </div>
+            <a href="{{ route('properties.create') }}" class="as-inline-action"><x-icon name="plus" size="18" />เพิ่มทรัพย์</a>
+        </div>
+
+        <ul class="as-list-surface">
+            @foreach ($properties as $property)
+                @php($primaryPhoto = $property->primaryPhoto ?? $property->photos->first())
+                <li>
+                    <a href="{{ route('properties.show', $property) }}" class="as-list-row">
+                        @if ($primaryPhoto)
+                            <img src="{{ route('properties.photos.thumbnail', [$property, $primaryPhoto]) }}" alt="" class="as-media-thumb" loading="lazy">
+                        @else
+                            <span class="as-media-placeholder"><x-icon name="building" size="23" /></span>
+                        @endif
+                        <span class="as-list-copy">
+                            <span class="as-list-title-line">
+                                <span class="as-list-title">{{ $property->name }}</span>
+                                <span class="as-status">{{ $property->status_label }}</span>
+                            </span>
+                            <span class="as-list-meta"><strong>{{ $property->transaction_label }}</strong> · {{ $property->formattedPrice() }}</span>
+                            <span class="as-list-meta"><x-icon name="building" size="14" class="mr-1 inline" />{{ $property->bedrooms }} ห้องนอน <span class="mx-1 text-stone-300">·</span> <x-icon name="map-pin" size="14" class="mr-1 inline" />{{ $property->location }}</span>
+                        </span>
+                        <x-icon name="chevron-right" size="19" class="as-row-chevron" />
+                    </a>
+                </li>
+            @endforeach
+        </ul>
     @endif
 @endsection

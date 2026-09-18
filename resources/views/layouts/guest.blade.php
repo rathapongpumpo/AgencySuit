@@ -3,14 +3,18 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="theme-color" content="#14532d">
+        <meta name="theme-color" content="#f4f2ed">
         <title>@yield('title', config('app.name'))</title>
         @unless (app()->environment('testing'))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endunless
     </head>
-    <body class="min-h-screen bg-stone-50 text-stone-950">
-        <main class="mx-auto flex min-h-screen w-full max-w-lg flex-col px-5 py-8 sm:px-8">
+    <body>
+        <main class="as-guest-shell">
+            <a href="{{ url('/') }}" class="as-guest-brand">
+                <span class="as-brand-mark">AS</span>
+                <span>AgencySuit</span>
+            </a>
             @yield('content')
         </main>
     </body>

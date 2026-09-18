@@ -28,6 +28,14 @@ quickAddSheet?.addEventListener('click', (event) => {
     }
 });
 
+document.querySelectorAll('[data-photo-delete-open]').forEach((button) => {
+    button.addEventListener('click', () => document.getElementById(button.dataset.photoDeleteOpen)?.showModal());
+});
+
+document.querySelectorAll('[data-photo-delete-close]').forEach((button) => {
+    button.addEventListener('click', () => button.closest('dialog')?.close());
+});
+
 document.querySelectorAll('[data-photo-input]').forEach((input) => {
     const preview = input.closest('[data-photo-upload]')?.querySelector('[data-photo-preview]');
 

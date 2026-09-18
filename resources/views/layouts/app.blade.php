@@ -3,55 +3,67 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="theme-color" content="#14532d">
+        <meta name="theme-color" content="#f4f2ed">
         <title>@yield('title', config('app.name'))</title>
         @unless (app()->environment('testing'))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endunless
     </head>
-    <body class="min-h-screen bg-stone-50 text-stone-950">
-        <div class="mx-auto min-h-screen w-full max-w-lg pb-28">
-            <header class="border-b border-stone-200 bg-white px-4 py-4 sm:px-6">
-                <a href="{{ route('today') }}" class="text-base font-bold tracking-tight text-green-900">{{ config('app.name') }}</a>
+    <body>
+        <div class="as-shell">
+            <header class="as-topbar">
+                <a href="{{ route('today') }}" class="as-brand">
+                    <span class="as-brand-mark">AS</span>
+                    <span class="as-brand-name">AgencySuit</span>
+                </a>
+                <span class="as-topbar-meta">งานของคุณ</span>
             </header>
 
-            <main class="px-4 py-6 sm:px-6">
+            <main class="as-main">
                 @yield('content')
             </main>
         </div>
 
         @unless (request()->routeIs('properties.create', 'properties.edit', 'clients.create', 'clients.edit', 'appointments.create', 'appointments.edit', 'clients.appointments.create', 'clients.deals.create', 'deals.edit'))
-            <button type="button" data-quick-add-open aria-haspopup="dialog" aria-controls="quick-add-sheet" class="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-4 z-20 flex size-13 items-center justify-center rounded-full bg-green-900 text-3xl font-light leading-none text-white shadow-lg shadow-green-950/20" aria-label="เพิ่มรายการ">+</button>
+            <button type="button" data-quick-add-open aria-haspopup="dialog" aria-controls="quick-add-sheet" class="as-fab" aria-label="เพิ่มรายการ">
+                <x-icon name="plus" size="26" />
+            </button>
         @endunless
 
-        <nav aria-label="เมนูหลัก" class="fixed inset-x-0 bottom-0 z-10 border-t border-stone-200 bg-white px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2">
-            <div class="mx-auto grid max-w-lg grid-cols-4 gap-1">
-                <a href="{{ route('today') }}" @class(['flex min-h-11 items-center justify-center rounded-lg px-1 text-center text-sm font-medium', 'bg-green-50 text-green-900' => request()->routeIs('today'), 'text-stone-600' => ! request()->routeIs('today')])>วันนี้</a>
-                <a href="{{ route('properties.index') }}" @class(['flex min-h-11 items-center justify-center rounded-lg px-1 text-center text-sm font-medium', 'bg-green-50 text-green-900' => request()->routeIs('properties.index'), 'text-stone-600' => ! request()->routeIs('properties.index')])>ทรัพย์</a>
-                <a href="{{ route('clients.index') }}" @class(['flex min-h-11 items-center justify-center rounded-lg px-1 text-center text-sm font-medium', 'bg-green-50 text-green-900' => request()->routeIs('clients.index'), 'text-stone-600' => ! request()->routeIs('clients.index')])>ลูกค้า</a>
-                <a href="{{ route('more') }}" @class(['flex min-h-11 items-center justify-center rounded-lg px-1 text-center text-sm font-medium', 'bg-green-50 text-green-900' => request()->routeIs('more'), 'text-stone-600' => ! request()->routeIs('more')])>เพิ่มเติม</a>
+        <nav aria-label="เมนูหลัก" class="as-bottom-nav">
+            <div class="as-bottom-nav-inner">
+                <a href="{{ route('today') }}" @class(['as-nav-item is-active' => request()->routeIs('today'), 'as-nav-item' => ! request()->routeIs('today')]) @if(request()->routeIs('today')) aria-current="page" @endif>
+                    <x-icon name="home" class="as-nav-icon" />
+                    <span>วันนี้</span>
+                </a>
+                <a href="{{ route('properties.index') }}" @class(['as-nav-item is-active' => request()->routeIs('properties.*'), 'as-nav-item' => ! request()->routeIs('properties.*')]) @if(request()->routeIs('properties.*')) aria-current="page" @endif>
+                    <x-icon name="building" class="as-nav-icon" />
+                    <span>ทรัพย์</span>
+                </a>
+                <a href="{{ route('clients.index') }}" @class(['as-nav-item is-active' => request()->routeIs('clients.*'), 'as-nav-item' => ! request()->routeIs('clients.*')]) @if(request()->routeIs('clients.*')) aria-current="page" @endif>
+                    <x-icon name="users" class="as-nav-icon" />
+                    <span>ลูกค้า</span>
+                </a>
+                <a href="{{ route('more') }}" @class(['as-nav-item is-active' => request()->routeIs('more', 'upgrade', 'feedback.*'), 'as-nav-item' => ! request()->routeIs('more', 'upgrade', 'feedback.*')]) @if(request()->routeIs('more', 'upgrade', 'feedback.*')) aria-current="page" @endif>
+                    <x-icon name="more" class="as-nav-icon" />
+                    <span>เพิ่มเติม</span>
+                </a>
             </div>
         </nav>
 
-        <dialog id="quick-add-sheet" aria-labelledby="quick-add-title" class="fixed inset-x-0 bottom-0 top-[auto] mx-auto mb-0 mt-auto w-full max-w-lg rounded-t-2xl border-0 bg-white p-0 text-stone-950 shadow-2xl backdrop:bg-stone-950/30">
+        <dialog id="quick-add-sheet" aria-labelledby="quick-add-title" class="as-sheet fixed inset-x-0 bottom-0 top-[auto] mx-auto mb-0 mt-auto p-0">
             <section class="px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3">
-                <div class="mx-auto h-1 w-10 rounded-full bg-stone-300"></div>
-                <div class="mt-5 flex items-center justify-between gap-4"><h2 id="quick-add-title" class="text-lg font-semibold">เพิ่มรายการ</h2><button type="button" data-quick-add-close class="min-h-11 px-2 text-sm font-medium text-stone-600">ปิด</button></div>
-                <p class="mt-1 text-sm text-stone-600">เลือกสิ่งที่ต้องการเริ่มต้น</p>
-                <div class="mt-4 divide-y divide-stone-100 rounded-xl border border-stone-200">
-                    @foreach (['เพิ่มทรัพย์', 'เพิ่มลูกค้า', 'นัดดู', 'ติดตาม'] as $action)
-                        @if ($action === 'เพิ่มทรัพย์')
-                            <a href="{{ route('properties.create') }}" class="flex min-h-13 items-center px-4 text-base font-medium text-stone-700">{{ $action }}</a>
-                        @elseif ($action === 'เพิ่มลูกค้า')
-                            <a href="{{ route('clients.create') }}" class="flex min-h-13 items-center px-4 text-base font-medium text-stone-700">{{ $action }}</a>
-                        @elseif ($action === 'นัดดู')
-                            <a href="{{ route('appointments.create') }}" class="flex min-h-13 items-center px-4 text-base font-medium text-stone-700">{{ $action }}</a>
-                        @elseif ($action === 'ติดตาม')
-                            <a href="{{ route('followups.create') }}" class="flex min-h-13 items-center px-4 text-base font-medium text-stone-700">{{ $action }}</a>
-                        @else
-                            <span class="flex min-h-13 items-center px-4 text-base font-medium text-stone-700">{{ $action }}</span>
-                        @endif
-                    @endforeach
+                <div class="as-sheet-handle"></div>
+                <div class="as-sheet-title-row">
+                    <h2 id="quick-add-title" class="as-sheet-title">เพิ่มรายการ</h2>
+                    <button type="button" data-quick-add-close class="as-sheet-close">ปิด</button>
+                </div>
+                <p class="as-page-subtitle mt-1">เลือกสิ่งที่ต้องการเริ่มต้น</p>
+                <div class="mt-4 divide-y divide-stone-100">
+                    <a href="{{ route('properties.create') }}" class="as-sheet-link"><span class="as-icon-box"><x-icon name="building" size="18" /></span>เพิ่มทรัพย์<x-icon name="chevron-right" size="18" class="ml-auto text-stone-400" /></a>
+                    <a href="{{ route('clients.create') }}" class="as-sheet-link"><span class="as-icon-box"><x-icon name="users" size="18" /></span>เพิ่มลูกค้า<x-icon name="chevron-right" size="18" class="ml-auto text-stone-400" /></a>
+                    <a href="{{ route('appointments.create') }}" class="as-sheet-link"><span class="as-icon-box"><x-icon name="calendar" size="18" /></span>นัดดู<x-icon name="chevron-right" size="18" class="ml-auto text-stone-400" /></a>
+                    <a href="{{ route('followups.create') }}" class="as-sheet-link"><span class="as-icon-box"><x-icon name="clock" size="18" /></span>ติดตาม<x-icon name="chevron-right" size="18" class="ml-auto text-stone-400" /></a>
                 </div>
                 <p class="mt-3 text-sm text-stone-500">เริ่มจากข้อมูลหลักก่อน แล้วเติมรายละเอียดภายหลังได้</p>
             </section>
