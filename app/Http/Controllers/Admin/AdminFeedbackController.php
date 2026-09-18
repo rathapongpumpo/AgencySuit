@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Feedback;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -50,7 +51,7 @@ class AdminFeedbackController extends Controller
         return view('admin.feedback.index', compact('feedbacks', 'counts'));
     }
 
-    public function updateStatus(Request $request, Feedback $feedback): RedirectResponse
+    public function updateStatus(Request $request, Feedback $feedback): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'status' => ['required', 'string', 'in:new,reviewed,planned,done'],
@@ -67,12 +68,28 @@ class AdminFeedbackController extends Controller
 
         $label = $statusLabels[$validated['status']] ?? $validated['status'];
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "เปลี่ยนสถานะข้อเสนอแนะเป็น '{$label}' เรียบร้อยแล้ว",
+                'status' => $validated['status'],
+                'label' => $label,
+            ]);
+        }
+
         return back()->with('success', "เปลี่ยนสถานะข้อเสนอแนะเป็น '{$label}' เรียบร้อยแล้ว");
     }
 
-    public function destroy(Feedback $feedback): RedirectResponse
+    public function destroy(Request $request, Feedback $feedback): RedirectResponse|JsonResponse
     {
         $feedback->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'ลบข้อเสนอแนะเรียบร้อยแล้ว',
+            ]);
+        }
 
         return back()->with('success', 'ลบข้อเสนอแนะเรียบร้อยแล้ว');
     }

@@ -19,27 +19,80 @@ class FollowUpController extends Controller
         return view('followups.create', ['clients' => $request->user()->clients()->orderBy('name')->get()]);
     }
 
-    public function storeQuickAdd(FollowUpRequest $request): RedirectResponse
+    public function storeQuickAdd(FollowUpRequest $request): RedirectResponse|JsonResponse
     {
         $client = $request->user()->clients()->findOrFail($request->validated('client_id'));
-        $this->save($request, $client);
+        $followUp = $this->save($request, $client);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'ตั้งเวลาติดตามแล้ว',
+                'follow_up' => [
+                    'id' => $followUp->id,
+                    'client_id' => $client->id,
+                    'due_date' => $followUp->due_date->format('d/m/Y'),
+                    'due_date_raw' => $followUp->due_date->toDateString(),
+                    'note' => $followUp->note,
+                    'status' => $followUp->status,
+                ],
+            ]);
+        }
 
         return to_route('clients.show', $client)->with('success', 'ตั้งเวลาติดตามแล้ว');
     }
 
-    public function store(FollowUpRequest $request, Client $client): RedirectResponse
+    public function store(FollowUpRequest $request, Client $client): RedirectResponse|JsonResponse
     {
         Gate::authorize('view', $client);
-        $this->save($request, $client);
+        $followUp = $this->save($request, $client);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'ตั้งเวลาติดตามแล้ว',
+                'follow_up' => [
+                    'id' => $followUp->id,
+                    'client_id' => $client->id,
+                    'due_date' => $followUp->due_date->format('d/m/Y'),
+                    'due_date_raw' => $followUp->due_date->toDateString(),
+                    'note' => $followUp->note,
+                    'status' => $followUp->status,
+                ],
+            ]);
+        }
 
         return to_route('clients.show', $client)->with('success', 'ตั้งเวลาติดตามแล้ว');
     }
 
-    private function save(FollowUpRequest $request, Client $client): void
+    private function save(FollowUpRequest $request, Client $client): FollowUp
     {
         $data = $request->validated();
         $dueDate = isset($data['days']) ? today()->addDays((int) $data['days']) : Carbon::parse($data['due_date']);
-        $request->user()->followUps()->create(['client_id' => $client->id, 'due_date' => $dueDate->toDateString(), 'note' => $data['note'] ?? null, 'status' => 'pending']);
+        $dateStr = $dueDate->toDateString();
+        $note = !empty($data['note']) ? trim((string) $data['note']) : null;
+
+        // Deduplicate: If there is already a pending follow-up on this date for this client, update it instead of creating duplicates
+        $existing = $request->user()->followUps()
+            ->where('client_id', $client->id)
+            ->where('status', 'pending')
+            ->whereDate('due_date', $dateStr)
+            ->first();
+
+        if ($existing) {
+            if ($note !== null) {
+                $existing->update(['note' => $note]);
+            }
+
+            return $existing;
+        }
+
+        return $request->user()->followUps()->create([
+            'client_id' => $client->id,
+            'due_date' => $dateStr,
+            'note' => $note,
+            'status' => 'pending',
+        ]);
     }
 
     public function complete(Request $request, FollowUp $followUp): RedirectResponse|JsonResponse
@@ -74,10 +127,17 @@ class FollowUpController extends Controller
         return back()->with('success', 'ลบรายการติดตามแล้ว');
     }
 
-    public function destroyAll(Request $request, Client $client): RedirectResponse
+    public function destroyAll(Request $request, Client $client): RedirectResponse|JsonResponse
     {
         Gate::authorize('update', $client);
         $client->followUps()->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'ล้างประวัติติดตามทั้งหมดของลูกค้านี้เรียบร้อยแล้ว',
+            ]);
+        }
 
         return back()->with('success', 'ล้างประวัติติดตามทั้งหมดของลูกค้านี้เรียบร้อยแล้ว');
     }

@@ -182,7 +182,7 @@
                                     <p class="as-page-subtitle">รูปจะถูกนำออกจากทรัพย์ {{ $property->name }}</p>
                                     <div class="mt-5 grid grid-cols-2 gap-2">
                                         <button type="button" class="as-action-secondary" data-photo-delete-close autofocus>ยกเลิก</button>
-                                        <form method="POST" action="{{ route('properties.photos.destroy', [$property, $photo]) }}">
+                                        <form method="POST" action="{{ route('properties.photos.destroy', [$property, $photo]) }}" data-photo-destroy>
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="as-action-danger">ลบรูป</button>

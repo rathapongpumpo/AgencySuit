@@ -31,11 +31,11 @@
                                 <a href="{{ route('clients.show', $followUp->client) }}" class="as-row-title">ติดตาม {{ $followUp->client->name }}</a>
                                 <span class="as-row-meta">{{ $followUp->note ?: 'เปิดหน้าลูกค้าเพื่อดูรายละเอียด' }}</span>
                                 <div class="flex items-center gap-2">
-                                    <form method="POST" action="{{ route('followups.complete', $followUp) }}">
+                                    <form method="POST" action="{{ route('followups.complete', $followUp) }}" data-followup-complete>
                                         @csrf @method('PATCH')
                                         <button class="as-row-control" type="submit"><x-icon name="check" size="14" />ทำแล้ว</button>
                                     </form>
-                                    <form method="POST" action="{{ route('followups.destroy', $followUp) }}">
+                                    <form method="POST" action="{{ route('followups.destroy', $followUp) }}" data-followup-destroy>
                                         @csrf @method('DELETE')
                                         <button class="as-row-control text-stone-400 hover:text-red-600 hover:border-red-300 hover:bg-red-50" type="submit" title="ลบรายการนี้"><x-icon name="trash" size="14" />ลบ</button>
                                     </form>
@@ -85,11 +85,11 @@
                                 <a href="{{ route('clients.show', $followUp->client) }}" class="as-row-title">{{ $followUp->client->name }}</a>
                                 <span class="as-row-meta">{{ $followUp->note ?: 'กลับไปคุยกับลูกค้ารายนี้' }}</span>
                                 <div class="flex items-center gap-2">
-                                    <form method="POST" action="{{ route('followups.complete', $followUp) }}">
+                                    <form method="POST" action="{{ route('followups.complete', $followUp) }}" data-followup-complete>
                                         @csrf @method('PATCH')
                                         <button class="as-row-control" type="submit"><x-icon name="check" size="14" />ทำแล้ว</button>
                                     </form>
-                                    <form method="POST" action="{{ route('followups.destroy', $followUp) }}">
+                                    <form method="POST" action="{{ route('followups.destroy', $followUp) }}" data-followup-destroy>
                                         @csrf @method('DELETE')
                                         <button class="as-row-control text-stone-400 hover:text-red-600 hover:border-red-300 hover:bg-red-50" type="submit" title="ลบรายการนี้"><x-icon name="trash" size="14" />ลบ</button>
                                     </form>

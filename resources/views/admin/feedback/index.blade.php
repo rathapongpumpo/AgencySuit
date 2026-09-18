@@ -142,7 +142,7 @@
                             </select>
                         </form>
 
-                        <form method="POST" action="{{ route('admin.feedback.destroy', $fb) }}">
+                        <form method="POST" action="{{ route('admin.feedback.destroy', $fb) }}" data-feedback-destroy>
                             @csrf
                             @method('DELETE')
                             <button

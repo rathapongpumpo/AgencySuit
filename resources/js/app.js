@@ -167,56 +167,274 @@ function showToast(message) {
     }, 2400);
 }
 
-// In-place Follow-up Complete (Today page & Client show page)
-document.querySelectorAll('form[action*="/follow-ups/"]').forEach((form) => {
-    if (!form.action.includes('/complete')) return;
+// Helper to bind follow-up row actions (complete and delete)
+function bindFollowUpRow(row) {
+    const completeForm = row.querySelector('form[data-followup-complete], form[action*="/complete"]');
+    if (completeForm && !completeForm._bound) {
+        completeForm._bound = true;
+        completeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = completeForm.querySelector('button[type="submit"]');
+            if (btn) btn.disabled = true;
 
-    form.addEventListener('submit', async (e) => {
+            try {
+                const res = await fetch(completeForm.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                    body: new FormData(completeForm),
+                });
+
+                if (res.ok) {
+                    showToast('ทำรายการติดตามแล้ว ✓');
+                    row.classList.add('as-row-leaving');
+                    setTimeout(() => {
+                        row.remove();
+                        updateFollowUpCounters();
+                    }, 280);
+                } else {
+                    completeForm.submit();
+                }
+            } catch {
+                completeForm.submit();
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        });
+    }
+
+    const destroyForm = row.querySelector('form[data-followup-destroy], form[action*="/follow-ups/"]:not([action*="/complete"])');
+    if (destroyForm && !destroyForm._bound) {
+        destroyForm._bound = true;
+        destroyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = destroyForm.querySelector('button[type="submit"]');
+            if (btn) btn.disabled = true;
+
+            try {
+                const res = await fetch(destroyForm.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                    body: new FormData(destroyForm),
+                });
+
+                if (res.ok) {
+                    showToast('ลบรายการติดตามแล้ว ✓');
+                    row.classList.add('as-row-leaving');
+                    setTimeout(() => {
+                        row.remove();
+                        updateFollowUpCounters();
+                    }, 280);
+                } else {
+                    destroyForm.submit();
+                }
+            } catch {
+                destroyForm.submit();
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        });
+    }
+}
+
+function updateFollowUpCounters() {
+    const pendingList = document.getElementById('pending-followup-list');
+    if (pendingList) {
+        const count = pendingList.querySelectorAll('li:not(.as-row-leaving)').length;
+        const countEl = document.getElementById('followup-pending-count');
+        if (countEl) countEl.textContent = count.toString();
+        const emptyEl = document.getElementById('no-pending-followup');
+        if (emptyEl) emptyEl.classList.toggle('hidden', count > 0);
+    }
+
+    const completedList = document.getElementById('completed-followup-list');
+    if (completedList) {
+        const count = completedList.querySelectorAll('li:not(.as-row-leaving)').length;
+        const countEl = document.getElementById('followup-completed-count');
+        if (countEl) countEl.textContent = count.toString();
+        if (count === 0) {
+            const details = document.getElementById('completed-followups-details');
+            if (details) details.remove();
+        }
+    }
+
+    // Today page section counters
+    document.querySelectorAll('.as-work-section').forEach((section) => {
+        const countEl = section.querySelector('.as-count');
+        if (countEl) {
+            const rows = section.querySelectorAll('li:not(.as-row-leaving)').length;
+            countEl.textContent = rows.toString();
+            if (rows === 0) {
+                section.remove();
+            }
+        }
+    });
+}
+
+// Bind all existing follow-up rows
+document.querySelectorAll('#pending-followup-list li, #completed-followup-list li, .as-work-row').forEach(bindFollowUpRow);
+
+// Clear All Follow-ups In-Place (No page reload)
+const destroyAllForm = document.getElementById('destroy-all-followups-form');
+if (destroyAllForm) {
+    destroyAllForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const submitBtn = form.querySelector('button[type="submit"]');
-        if (submitBtn) submitBtn.disabled = true;
-
-        const row = form.closest('.as-work-row') || form.closest('li');
+        const btn = destroyAllForm.querySelector('button[type="submit"]');
+        if (btn) btn.disabled = true;
 
         try {
-            const res = await fetch(form.action, {
+            const res = await fetch(destroyAllForm.action, {
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'application/json',
                 },
-                body: new FormData(form),
+                body: new FormData(destroyAllForm),
             });
 
             if (res.ok) {
-                showToast('ทำรายการติดตามแล้ว ✓');
-                if (row) {
-                    const section = row.closest('.as-work-section') || row.closest('section');
-                    if (section) {
-                        const countEl = section.querySelector('.as-count');
-                        if (countEl) {
-                            const current = parseInt(countEl.textContent, 10);
-                            if (!isNaN(current) && current > 0) {
-                                countEl.textContent = (current - 1).toString();
-                            }
-                        }
-                    }
-
-                    row.classList.add('as-row-leaving');
-                    setTimeout(() => {
-                        row.remove();
-                    }, 300);
-                }
+                showToast('ล้างประวัติติดตามทั้งหมดแล้ว ✓');
+                const pendingList = document.getElementById('pending-followup-list');
+                if (pendingList) pendingList.innerHTML = '';
+                const completedDetails = document.getElementById('completed-followups-details');
+                if (completedDetails) completedDetails.remove();
+                const countEl = document.getElementById('followup-pending-count');
+                if (countEl) countEl.textContent = '0';
+                const emptyEl = document.getElementById('no-pending-followup');
+                if (emptyEl) emptyEl.classList.remove('hidden');
+                destroyAllForm.style.display = 'none';
             } else {
-                if (submitBtn) submitBtn.disabled = false;
-                form.submit();
+                destroyAllForm.submit();
             }
         } catch {
-            if (submitBtn) submitBtn.disabled = false;
-            form.submit();
+            destroyAllForm.submit();
+        } finally {
+            if (btn) btn.disabled = false;
         }
     });
-});
+}
+
+// Add Follow-up In-Place (No page reload, instant UI update)
+const addFollowupForm = document.getElementById('add-followup-form');
+if (addFollowupForm) {
+    addFollowupForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitter = e.submitter;
+        const formData = new FormData(addFollowupForm);
+        if (submitter && submitter.name) {
+            formData.set(submitter.name, submitter.value);
+        }
+
+        const buttons = addFollowupForm.querySelectorAll('button[type="submit"]');
+        buttons.forEach((b) => { b.disabled = true; });
+
+        try {
+            const res = await fetch(addFollowupForm.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+                body: formData,
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                showToast(data.message || 'ตั้งเวลาติดตามแล้ว ✓');
+
+                const pendingList = document.getElementById('pending-followup-list');
+                if (pendingList && data.follow_up) {
+                    const existingRow = document.getElementById(`followup-row-${data.follow_up.id}`);
+                    if (existingRow) {
+                        // Update existing row
+                        const dateSpan = existingRow.querySelector('.followup-date');
+                        if (dateSpan) dateSpan.textContent = data.follow_up.due_date;
+                        let noteSpan = existingRow.querySelector('.followup-note');
+                        if (data.follow_up.note) {
+                            if (noteSpan) {
+                                noteSpan.textContent = data.follow_up.note;
+                            } else {
+                                const noteEl = document.createElement('span');
+                                noteEl.className = 'block truncate text-xs text-stone-500 followup-note';
+                                noteEl.textContent = data.follow_up.note;
+                                existingRow.querySelector('.min-w-0')?.appendChild(noteEl);
+                            }
+                        } else if (noteSpan) {
+                            noteSpan.remove();
+                        }
+                    } else {
+                        // Create new row
+                        const li = document.createElement('li');
+                        li.className = 'flex items-center justify-between py-2 text-sm';
+                        li.id = `followup-row-${data.follow_up.id}`;
+                        li.dataset.followupId = data.follow_up.id;
+                        li.dataset.dueDate = data.follow_up.due_date_raw;
+
+                        const csrfToken = document.querySelector('input[name="_token"]')?.value || '';
+                        const noteHtml = data.follow_up.note ? `<span class="block truncate text-xs text-stone-500 followup-note">${escapeHtml(data.follow_up.note)}</span>` : '';
+
+                        li.innerHTML = `
+                            <div class="min-w-0 pr-2">
+                                <span class="font-semibold text-stone-800 followup-date">${data.follow_up.due_date}</span>
+                                ${noteHtml}
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <form method="POST" action="/follow-ups/${data.follow_up.id}/complete" data-followup-complete>
+                                    <input type="hidden" name="_token" value="${csrfToken}">
+                                    <input type="hidden" name="_method" value="PATCH">
+                                    <button class="as-inline-action px-2 py-1 text-xs" type="submit">ทำแล้ว</button>
+                                </form>
+                                <form method="POST" action="/follow-ups/${data.follow_up.id}" data-followup-destroy>
+                                    <input type="hidden" name="_token" value="${csrfToken}">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button class="text-xs text-red-500 hover:text-red-700 p-1" type="submit" title="ลบรายการนี้">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        `;
+                        pendingList.prepend(li);
+                        bindFollowUpRow(li);
+                    }
+
+                    // Reset form inputs
+                    const dateInput = addFollowupForm.querySelector('input[name="due_date"]');
+                    if (dateInput) dateInput.value = '';
+                    const noteInput = addFollowupForm.querySelector('input[name="note"]');
+                    if (noteInput) noteInput.value = '';
+
+                    const emptyMsg = document.getElementById('no-pending-followup');
+                    if (emptyMsg) emptyMsg.classList.add('hidden');
+
+                    const countEl = document.getElementById('followup-pending-count');
+                    if (countEl) {
+                        const total = pendingList.querySelectorAll('li:not(.as-row-leaving)').length;
+                        countEl.textContent = total.toString();
+                    }
+
+                    if (destroyAllForm) destroyAllForm.style.display = '';
+                }
+            } else {
+                addFollowupForm.submit();
+            }
+        } catch {
+            addFollowupForm.submit();
+        } finally {
+            buttons.forEach((b) => { b.disabled = false; });
+        }
+    });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 
 // In-place Property Status Change
 document.querySelectorAll('form[action*="/properties/"][action*="/status"]').forEach((form) => {
@@ -301,10 +519,14 @@ document.querySelectorAll('form[action*="/appointments/"][action*="/cancel"]').f
     });
 });
 
-// In-place Photo Actions (Primary & Delete)
-document.querySelectorAll('form[action*="/photos/"][action*="/primary"]').forEach((form) => {
+// In-place Photo Delete
+document.querySelectorAll('form[data-photo-destroy]').forEach((form) => {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const dialog = form.closest('dialog');
+        if (dialog) dialog.close();
+
+        const figure = form.closest('figure');
         try {
             const res = await fetch(form.action, {
                 method: 'POST',
@@ -316,15 +538,11 @@ document.querySelectorAll('form[action*="/photos/"][action*="/primary"]').forEac
             });
 
             if (res.ok) {
-                showToast('เปลี่ยนภาพหลักแล้ว ✓');
-                const photoGrid = form.closest('[data-photo-grid]');
-                if (photoGrid) {
-                    photoGrid.querySelectorAll('.as-text-link.text-\\[11px\\]').forEach((badge) => {
-                        badge.replaceWith(badge); // keep or re-render
-                    });
+                showToast('ลบรูปแล้ว ✓');
+                if (figure) {
+                    figure.classList.add('as-row-leaving');
+                    setTimeout(() => figure.remove(), 280);
                 }
-                // Reload photo grid section seamlessly if needed or let user see badge
-                window.location.reload();
             } else {
                 form.submit();
             }
@@ -334,18 +552,33 @@ document.querySelectorAll('form[action*="/photos/"][action*="/primary"]').forEac
     });
 });
 
-// Scroll Position Preservation for any traditional form post/redirect
-const savedScroll = sessionStorage.getItem('as_scroll_y');
-if (savedScroll !== null) {
-    sessionStorage.removeItem('as_scroll_y');
-    const scrollTarget = parseInt(savedScroll, 10);
-    if (!isNaN(scrollTarget) && scrollTarget > 0) {
-        window.scrollTo({ top: scrollTarget, behavior: 'instant' });
-    }
-}
+// In-place Feedback Delete in Admin
+document.querySelectorAll('form[data-feedback-destroy]').forEach((form) => {
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const card = form.closest('.rounded-xl') || form.closest('article') || form.closest('div.border');
 
-window.addEventListener('beforeunload', () => {
-    if (window.scrollY > 0) {
-        sessionStorage.setItem('as_scroll_y', window.scrollY.toString());
-    }
+        try {
+            const res = await fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+                body: new FormData(form),
+            });
+
+            if (res.ok) {
+                showToast('ลบข้อเสนอแนะแล้ว ✓');
+                if (card) {
+                    card.classList.add('as-row-leaving');
+                    setTimeout(() => card.remove(), 280);
+                }
+            } else {
+                form.submit();
+            }
+        } catch {
+            form.submit();
+        }
+    });
 });
