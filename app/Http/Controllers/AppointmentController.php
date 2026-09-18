@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AppointmentRequest;
 use App\Models\Appointment;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -59,10 +60,17 @@ class AppointmentController extends Controller
         return to_route('appointments.show', $appointment)->with('success', 'แก้ไขนัดดูแล้ว');
     }
 
-    public function cancel(Appointment $appointment): RedirectResponse
+    public function cancel(Request $request, Appointment $appointment): RedirectResponse|JsonResponse
     {
         Gate::authorize('update', $appointment);
         $appointment->update(['status' => 'cancelled']);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'ยกเลิกนัดดูแล้ว',
+            ]);
+        }
 
         return to_route('appointments.show', $appointment)->with('success', 'ยกเลิกนัดดูแล้ว');
     }

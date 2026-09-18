@@ -6,6 +6,7 @@ use App\Http\Requests\FollowUpRequest;
 use App\Models\Client;
 use App\Models\FollowUp;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -41,10 +42,18 @@ class FollowUpController extends Controller
         $request->user()->followUps()->create(['client_id' => $client->id, 'due_date' => $dueDate->toDateString(), 'note' => $data['note'] ?? null, 'status' => 'pending']);
     }
 
-    public function complete(FollowUp $followUp): RedirectResponse
+    public function complete(Request $request, FollowUp $followUp): RedirectResponse|JsonResponse
     {
         Gate::authorize('update', $followUp);
         $followUp->update(['status' => 'completed']);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'ทำรายการติดตามแล้ว',
+                'id' => $followUp->id,
+            ]);
+        }
 
         return back()->with('success', 'ทำรายการติดตามแล้ว');
     }

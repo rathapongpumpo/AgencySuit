@@ -10,6 +10,7 @@ use App\Models\PropertyPhoto;
 use App\Services\MatchingService;
 use App\Services\PlanService;
 use App\Services\PropertyPhotoService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -83,10 +84,19 @@ class PropertyController extends Controller
         return to_route('properties.show', $property)->with('success', 'แก้ไขทรัพย์แล้ว');
     }
 
-    public function updateStatus(PropertyStatusRequest $request, Property $property): RedirectResponse
+    public function updateStatus(PropertyStatusRequest $request, Property $property): RedirectResponse|JsonResponse
     {
         Gate::authorize('update', $property);
         $property->update($request->validated());
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'เปลี่ยนสถานะแล้ว',
+                'status' => $property->status,
+                'status_label' => $property->status_label,
+            ]);
+        }
 
         return to_route('properties.show', $property)->with('success', 'เปลี่ยนสถานะแล้ว');
     }
@@ -114,7 +124,7 @@ class PropertyController extends Controller
         return to_route('properties.show', $property)->with('success', 'เพิ่มรูปแล้ว');
     }
 
-    public function setPrimaryPhoto(Property $property, PropertyPhoto $photo): RedirectResponse
+    public function setPrimaryPhoto(Request $request, Property $property, PropertyPhoto $photo): RedirectResponse|JsonResponse
     {
         Gate::authorize('update', $property);
         $photo = $this->ownedPhoto($property, $photo);
@@ -122,10 +132,18 @@ class PropertyController extends Controller
         $property->photos()->update(['is_primary' => false]);
         $photo->update(['is_primary' => true]);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'เปลี่ยนภาพหลักแล้ว',
+                'photo_id' => $photo->id,
+            ]);
+        }
+
         return to_route('properties.show', $property)->with('success', 'เปลี่ยนภาพหลักแล้ว');
     }
 
-    public function destroyPhoto(Property $property, PropertyPhoto $photo): RedirectResponse
+    public function destroyPhoto(Request $request, Property $property, PropertyPhoto $photo): RedirectResponse|JsonResponse
     {
         Gate::authorize('update', $property);
         $photo = $this->ownedPhoto($property, $photo);
@@ -134,8 +152,22 @@ class PropertyController extends Controller
         Storage::disk('local')->delete(array_filter([$photo->path, $photo->thumbnail_path]));
         $photo->delete();
 
+        $newPrimaryId = null;
         if ($wasPrimary) {
-            $property->photos()->where('is_primary', false)->orderBy('id')->first()?->update(['is_primary' => true]);
+            $newPrimary = $property->photos()->where('is_primary', false)->orderBy('id')->first();
+            if ($newPrimary) {
+                $newPrimary->update(['is_primary' => true]);
+                $newPrimaryId = $newPrimary->id;
+            }
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'ลบรูปแล้ว',
+                'photo_id' => $photo->id,
+                'new_primary_id' => $newPrimaryId,
+            ]);
         }
 
         return to_route('properties.show', $property)->with('success', 'ลบรูปแล้ว');
