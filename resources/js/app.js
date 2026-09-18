@@ -106,6 +106,45 @@ document.querySelectorAll('[data-share-form]').forEach((form) => {
     });
 });
 
+document.querySelectorAll('[data-share-single-property]').forEach((button) => {
+    button.addEventListener('click', async () => {
+        const feedback = document.querySelector('[data-share-single-feedback]');
+        const parts = [
+            button.dataset.name,
+            `${button.dataset.type} · ${button.dataset.price}`,
+            button.dataset.size ? `${button.dataset.bedrooms} · ${button.dataset.size}` : button.dataset.bedrooms,
+            `ทำเล: ${button.dataset.location}`,
+        ];
+        if (button.dataset.notes) {
+            parts.push(`หมายเหตุ: ${button.dataset.notes}`);
+        }
+        const text = parts.join('\n');
+
+        const copyText = async () => {
+            if (window.navigator.clipboard?.writeText) {
+                await window.navigator.clipboard.writeText(text);
+                if (feedback) feedback.textContent = 'คัดลอกข้อมูลทรัพย์แล้ว นำไปส่งต่อได้เลย ✓';
+                return;
+            }
+            if (feedback) feedback.textContent = text;
+        };
+
+        try {
+            if (typeof window.navigator.share === 'function') {
+                await Promise.race([
+                    window.navigator.share({ title: button.dataset.name, text }),
+                    new Promise((_, reject) => window.setTimeout(() => reject(new Error('share-timeout')), 1500)),
+                ]);
+                if (feedback) feedback.textContent = 'เปิดหน้าต่างแชร์แล้ว';
+                return;
+            }
+            await copyText();
+        } catch (error) {
+            if (error?.name !== 'AbortError') await copyText();
+        }
+    });
+});
+
 /* ==========================================================================
    Smooth In-Place Actions & Scroll Preservation (No Jitter, No Full Reload)
    ========================================================================== */

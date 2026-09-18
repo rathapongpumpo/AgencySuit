@@ -18,6 +18,11 @@
                 <span class="as-setting-meta block truncate">{{ auth()->user()->email }}</span>
             </span>
         </div>
+        <a href="{{ route('deals.index') }}" class="as-setting-row">
+            <span class="as-icon-box"><x-icon name="briefcase" size="19" /></span>
+            <span class="min-w-0 flex-1"><span class="as-setting-label block">ภาพรวมดีลและคอมมิชชัน</span><span class="as-setting-meta block">ติดตามสถานะและรายได้สะสม</span></span>
+            <x-icon name="chevron-right" size="17" class="text-stone-400" />
+        </a>
         <a href="{{ route('upgrade') }}" class="as-setting-row">
             <span class="as-icon-box"><x-icon name="building" size="19" /></span>
             <span class="min-w-0 flex-1"><span class="as-setting-label block">แผนการใช้งาน</span><span class="as-setting-meta block">ดูสิทธิ์และทางเลือกเพิ่มเติม</span></span>

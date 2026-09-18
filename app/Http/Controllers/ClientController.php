@@ -15,8 +15,27 @@ class ClientController extends Controller
 {
     public function index(Request $request): View
     {
+        $query = $request->user()->clients();
+
+        if ($q = trim((string) $request->input('q', ''))) {
+            $query->where(function ($b) use ($q): void {
+                $b->where('name', 'like', "%{$q}%")
+                    ->orWhere('phone', 'like', "%{$q}%")
+                    ->orWhere('locations', 'like', "%{$q}%")
+                    ->orWhere('notes', 'like', "%{$q}%");
+            });
+        }
+
+        if ($type = $request->input('type')) {
+            if (in_array($type, ['buy', 'rent'], true)) {
+                $query->where('transaction_type', $type);
+            }
+        }
+
         return view('clients.index', [
-            'clients' => $request->user()->clients()->latest()->get(),
+            'clients' => $query->latest()->get(),
+            'currentSearch' => $request->input('q', ''),
+            'currentType' => $request->input('type', 'all'),
         ]);
     }
 

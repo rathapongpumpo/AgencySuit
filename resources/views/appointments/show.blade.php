@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'รายละเอียดนัดดู | AgencySuit')
 
@@ -43,6 +43,35 @@
             </div>
         @endif
     </dl>
+
+    @if($appointment->status === 'scheduled')
+        @php
+            $dtStart = \Carbon\Carbon::parse($appointment->appointment_date->format('Y-m-d').' '.$appointment->appointment_time);
+            $dtEnd = (clone $dtStart)->addHour();
+            $gCalTitle = 'นัดดู: '.($appointment->property?->name ?? 'ทรัพย์');
+            $gCalDetails = 'ลูกค้า: '.($appointment->client?->name ?? '-').($appointment->client?->phone ? ' ('.$appointment->client->phone.')' : '').($appointment->note ? "\nหมายเหตุ: ".$appointment->note : '');
+            $gCalLocation = $appointment->property?->location ?? '';
+            $gCalUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+                .'&text='.urlencode($gCalTitle)
+                .'&dates='.$dtStart->utc()->format('Ymd\THis\Z').'/'.$dtEnd->utc()->format('Ymd\THis\Z')
+                .'&details='.urlencode($gCalDetails)
+                .'&location='.urlencode($gCalLocation);
+        @endphp
+
+        <div class="mt-4 rounded-xl border border-stone-200 bg-white p-3.5 shadow-sm">
+            <span class="text-xs font-semibold text-stone-500">บันทึกลงปฏิทินมือถือ</span>
+            <div class="mt-2.5 grid grid-cols-2 gap-2">
+                <a href="{{ $gCalUrl }}" target="_blank" rel="noopener noreferrer" class="as-action-secondary flex items-center justify-center gap-1.5 text-xs font-bold text-teal-900">
+                    <x-icon name="calendar" size="15" />
+                    <span>Google Calendar</span>
+                </a>
+                <a href="{{ route('appointments.ics', $appointment) }}" class="as-action-secondary flex items-center justify-center gap-1.5 text-xs font-bold text-stone-800">
+                    <x-icon name="clock" size="15" />
+                    <span>ดาวน์โหลด .ICS</span>
+                </a>
+            </div>
+        </div>
+    @endif
 
     @if($appointment->status === 'scheduled')
         <div class="mt-6 grid grid-cols-2 gap-2">

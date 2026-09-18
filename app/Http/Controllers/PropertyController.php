@@ -21,8 +21,34 @@ class PropertyController extends Controller
 {
     public function index(Request $request): View
     {
+        $query = $request->user()->properties()->with(['photos', 'primaryPhoto']);
+
+        if ($q = trim((string) $request->input('q', ''))) {
+            $query->where(function ($b) use ($q): void {
+                $b->where('name', 'like', "%{$q}%")
+                    ->orWhere('location', 'like', "%{$q}%")
+                    ->orWhere('unit_number', 'like', "%{$q}%")
+                    ->orWhere('owner_name', 'like', "%{$q}%");
+            });
+        }
+
+        if ($type = $request->input('type')) {
+            if (in_array($type, ['sale', 'rent'], true)) {
+                $query->where('transaction_type', $type);
+            }
+        }
+
+        if ($status = $request->input('status')) {
+            if (in_array($status, ['available', 'reserved', 'sold', 'paused'], true)) {
+                $query->where('status', $status);
+            }
+        }
+
         return view('properties.index', [
-            'properties' => $request->user()->properties()->with(['photos', 'primaryPhoto'])->latest()->get(),
+            'properties' => $query->latest()->get(),
+            'currentSearch' => $request->input('q', ''),
+            'currentType' => $request->input('type', 'all'),
+            'currentStatus' => $request->input('status', 'all'),
         ]);
     }
 

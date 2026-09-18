@@ -59,6 +59,18 @@ class MatchingServiceTest extends TestCase
         $this->assertSame(1.0, $result['breakdown']['other']);
     }
 
+    public function test_property_size_matches_client_minimum_size(): void
+    {
+        $service = new MatchingService;
+        $client = $this->client(['minimum_size' => 40]);
+
+        $meetsSize = $service->score($this->property(['size' => 45]), $client);
+        $this->assertSame(1.0, $meetsSize['breakdown']['size']);
+
+        $underSize = $service->score($this->property(['size' => 20]), $client);
+        $this->assertSame(0.5, $underSize['breakdown']['size']);
+    }
+
     /** @param array<string, mixed> $overrides */
     private function property(array $overrides = []): Property
     {

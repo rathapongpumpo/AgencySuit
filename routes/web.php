@@ -62,10 +62,12 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/appointments/create', [AppointmentController::class, 'create'])->name('appointments.create');
     Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
     Route::get('/appointments/{appointment}', [AppointmentController::class, 'show'])->name('appointments.show');
+    Route::get('/appointments/{appointment}/ics', [AppointmentController::class, 'ics'])->name('appointments.ics');
     Route::get('/appointments/{appointment}/edit', [AppointmentController::class, 'edit'])->name('appointments.edit');
     Route::put('/appointments/{appointment}', [AppointmentController::class, 'update'])->name('appointments.update');
     Route::patch('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])->name('appointments.cancel');
     Route::delete('/appointments/{appointment}', [AppointmentController::class, 'destroy'])->name('appointments.destroy');
+    Route::get('/deals', [DealController::class, 'index'])->name('deals.index');
     Route::get('/deals/{deal}', [DealController::class, 'show'])->name('deals.show');
     Route::get('/deals/{deal}/edit', [DealController::class, 'edit'])->name('deals.edit');
     Route::put('/deals/{deal}', [DealController::class, 'update'])->name('deals.update');

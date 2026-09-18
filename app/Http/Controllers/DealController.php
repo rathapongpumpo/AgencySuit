@@ -13,6 +13,37 @@ use Illuminate\View\View;
 
 class DealController extends Controller
 {
+    public function index(Request $request): View
+    {
+        $allDeals = $request->user()->deals()->with(['client', 'property'])->latest()->get();
+
+        $closedDeals = $allDeals->where('stage', 'closed');
+        $activeDeals = $allDeals->where('stage', '!=', 'closed');
+
+        $closedVolume = $closedDeals->sum(fn ($d): float => (float) $d->amount);
+        $closedCommission = $closedDeals->sum(fn ($d): float => (float) $d->agentCommission());
+        $pipelineCommission = $activeDeals->sum(fn ($d): float => (float) $d->agentCommission());
+
+        $filter = $request->input('status', 'active');
+        $filteredDeals = match ($filter) {
+            'closed' => $closedDeals,
+            'all' => $allDeals,
+            default => $activeDeals,
+        };
+
+        return view('deals.index', [
+            'deals' => $filteredDeals,
+            'currentFilter' => $filter,
+            'activeCount' => $activeDeals->count(),
+            'closedCount' => $closedDeals->count(),
+            'totalCount' => $allDeals->count(),
+            'closedVolume' => $closedVolume,
+            'closedCommission' => $closedCommission,
+            'pipelineCommission' => $pipelineCommission,
+            'stages' => config('deals.stages', []),
+        ]);
+    }
+
     public function create(Request $request, Client $client): View
     {
         Gate::authorize('view', $client);

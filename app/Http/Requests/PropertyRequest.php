@@ -19,6 +19,13 @@ class PropertyRequest extends FormRequest
             'price' => ['required', 'numeric', 'min:0'],
             'bedrooms' => ['required', 'integer', 'min:0', 'max:50'],
             'location' => ['required', 'string', 'max:255'],
+            'owner_name' => ['nullable', 'string', 'max:255'],
+            'owner_phone' => ['nullable', 'string', 'max:50'],
+            'owner_line' => ['nullable', 'string', 'max:100'],
+            'size' => ['nullable', 'numeric', 'min:0', 'max:99999'],
+            'floor' => ['nullable', 'string', 'max:20'],
+            'unit_number' => ['nullable', 'string', 'max:50'],
+            'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }
 

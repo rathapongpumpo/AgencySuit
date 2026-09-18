@@ -53,6 +53,48 @@
                 @error('location')<p class="mt-1.5 text-sm text-red-700">{{ $message }}</p>@enderror
             </div>
 
+            <details class="as-surface overflow-hidden rounded-xl border border-stone-200">
+                <summary class="flex cursor-pointer items-center justify-between p-3.5 text-sm font-semibold text-teal-800 select-none">
+                    <span>+ เพิ่มข้อมูลเจ้าของและสเปกห้อง (ถ้ามี)</span>
+                    <x-icon name="chevron-right" size="16" class="text-stone-400" />
+                </summary>
+                <div class="space-y-4 border-t border-stone-100 p-4 pt-3">
+                    <p class="text-xs text-stone-500">ข้อมูลส่วนนี้ไม่บังคับ สามารถเติมหรือแก้ไขทีหลังได้</p>
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div class="as-field">
+                            <label for="owner_name" class="as-field-label text-xs">ชื่อเจ้าของทรัพย์</label>
+                            <input id="owner_name" name="owner_name" type="text" value="{{ old('owner_name') }}" maxlength="255" class="as-input">
+                        </div>
+                        <div class="as-field">
+                            <label for="owner_phone" class="as-field-label text-xs">เบอร์โทรเจ้าของ</label>
+                            <input id="owner_phone" name="owner_phone" type="tel" value="{{ old('owner_phone') }}" maxlength="50" class="as-input" placeholder="08xxxxxxxx">
+                        </div>
+                    </div>
+                    <div class="as-field">
+                        <label for="owner_line" class="as-field-label text-xs">LINE ID เจ้าของ</label>
+                        <input id="owner_line" name="owner_line" type="text" value="{{ old('owner_line') }}" maxlength="100" class="as-input">
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="as-field">
+                            <label for="size" class="as-field-label text-xs">ขนาด (ตร.ม.)</label>
+                            <input id="size" name="size" type="number" step="0.01" min="0" value="{{ old('size') }}" class="as-input" placeholder="เช่น 35">
+                        </div>
+                        <div class="as-field">
+                            <label for="floor" class="as-field-label text-xs">ชั้น</label>
+                            <input id="floor" name="floor" type="text" value="{{ old('floor') }}" maxlength="20" class="as-input" placeholder="เช่น 12A">
+                        </div>
+                        <div class="as-field">
+                            <label for="unit_number" class="as-field-label text-xs">เลขที่ห้อง</label>
+                            <input id="unit_number" name="unit_number" type="text" value="{{ old('unit_number') }}" maxlength="50" class="as-input" placeholder="เช่น 88/12">
+                        </div>
+                    </div>
+                    <div class="as-field">
+                        <label for="notes" class="as-field-label text-xs">หมายเหตุ / จุดเด่นของทรัพย์</label>
+                        <textarea id="notes" name="notes" rows="2" maxlength="1000" class="as-input" placeholder="เช่น วิวแม่น้ำ เลี้ยงสัตว์ได้ รวมค่าส่วนกลางแล้ว">{{ old('notes') }}</textarea>
+                    </div>
+                </div>
+            </details>
+
             <button type="submit" class="as-action-primary">บันทึกทรัพย์</button>
         </form>
     @endif

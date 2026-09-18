@@ -48,6 +48,44 @@
             @error('location')<p class="mt-1.5 text-sm text-red-700">{{ $message }}</p>@enderror
         </div>
 
+        <div class="mt-6 border-t border-stone-100 pt-5">
+            <h2 class="as-field-label text-base font-bold text-stone-800">ข้อมูลเจ้าของและสเปกห้อง</h2>
+            <div class="mt-3 space-y-4">
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div class="as-field">
+                        <label for="owner_name" class="as-field-label">ชื่อเจ้าของทรัพย์</label>
+                        <input id="owner_name" name="owner_name" type="text" value="{{ old('owner_name', $property->owner_name) }}" maxlength="255" class="as-input">
+                    </div>
+                    <div class="as-field">
+                        <label for="owner_phone" class="as-field-label">เบอร์โทรเจ้าของ</label>
+                        <input id="owner_phone" name="owner_phone" type="tel" value="{{ old('owner_phone', $property->owner_phone) }}" maxlength="50" class="as-input" placeholder="08xxxxxxxx">
+                    </div>
+                </div>
+                <div class="as-field">
+                    <label for="owner_line" class="as-field-label">LINE ID เจ้าของ</label>
+                    <input id="owner_line" name="owner_line" type="text" value="{{ old('owner_line', $property->owner_line) }}" maxlength="100" class="as-input">
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="as-field">
+                        <label for="size" class="as-field-label">ขนาด (ตร.ม.)</label>
+                        <input id="size" name="size" type="number" step="0.01" min="0" value="{{ old('size', $property->size) }}" class="as-input" placeholder="เช่น 35">
+                    </div>
+                    <div class="as-field">
+                        <label for="floor" class="as-field-label">ชั้น</label>
+                        <input id="floor" name="floor" type="text" value="{{ old('floor', $property->floor) }}" maxlength="20" class="as-input" placeholder="เช่น 12A">
+                    </div>
+                    <div class="as-field">
+                        <label for="unit_number" class="as-field-label">เลขที่ห้อง</label>
+                        <input id="unit_number" name="unit_number" type="text" value="{{ old('unit_number', $property->unit_number) }}" maxlength="50" class="as-input" placeholder="เช่น 88/12">
+                    </div>
+                </div>
+                <div class="as-field">
+                    <label for="notes" class="as-field-label">หมายเหตุ / จุดเด่นของทรัพย์</label>
+                    <textarea id="notes" name="notes" rows="2" maxlength="1000" class="as-input" placeholder="เช่น วิวแม่น้ำ เลี้ยงสัตว์ได้ รวมค่าส่วนกลางแล้ว">{{ old('notes', $property->notes) }}</textarea>
+                </div>
+            </div>
+        </div>
+
         <button type="submit" class="as-action-primary">บันทึกการแก้ไข</button>
     </form>
 

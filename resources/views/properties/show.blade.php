@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', $property->name.' | AgencySuit')
 
@@ -24,6 +24,32 @@
         <p class="as-detail-subtitle">{{ $property->transaction_label }} · {{ $property->location }}</p>
     </div>
 
+    {{-- Owner Contact Bar --}}
+    @if ($property->owner_phone || $property->owner_line || $property->owner_name)
+        <div class="mt-4 rounded-xl border border-stone-200 bg-white p-3.5 shadow-sm">
+            <div class="flex items-center justify-between gap-2">
+                <div class="min-w-0 flex-1">
+                    <span class="text-xs font-semibold text-stone-500">เจ้าของทรัพย์</span>
+                    <p class="truncate text-sm font-bold text-stone-900">{{ $property->owner_name ?: 'ไม่ระบุชื่อ' }}</p>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    @if ($property->owner_phone)
+                        <a href="tel:{{ $property->owner_phone }}" class="inline-flex h-9 items-center gap-1.5 rounded-lg bg-teal-800 px-3 text-xs font-bold text-white hover:bg-teal-900 active:scale-95">
+                            <x-icon name="phone" size="14" />
+                            <span>โทร</span>
+                        </a>
+                    @endif
+                    @if ($property->owner_line)
+                        <a href="https://line.me/R/ti/p/~{{ urlencode($property->owner_line) }}" target="_blank" rel="noopener noreferrer" class="inline-flex h-9 items-center gap-1.5 rounded-lg border border-stone-300 bg-stone-50 px-3 text-xs font-bold text-stone-800 hover:bg-stone-100 active:scale-95">
+                            <x-icon name="chat" size="14" />
+                            <span>LINE</span>
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+
     {{-- Specs Card --}}
     <dl class="as-detail-list mt-4">
         <div>
@@ -34,10 +60,28 @@
             <dt>ห้องนอน</dt>
             <dd>{{ $property->bedrooms }} ห้องนอน</dd>
         </div>
+        @if ($property->size)
+            <div>
+                <dt>ขนาดห้อง</dt>
+                <dd>{{ $property->formattedSize() }}</dd>
+            </div>
+        @endif
+        @if ($property->floor || $property->unit_number)
+            <div>
+                <dt>ชั้น / เลขที่ห้อง</dt>
+                <dd>{{ $property->floor ? 'ชั้น '.$property->floor : '' }}{{ $property->floor && $property->unit_number ? ' · ' : '' }}{{ $property->unit_number ? 'ห้อง '.$property->unit_number : '' }}</dd>
+            </div>
+        @endif
         <div>
             <dt>ทำเล</dt>
             <dd>{{ $property->location }}</dd>
         </div>
+        @if ($property->notes)
+            <div>
+                <dt>หมายเหตุ</dt>
+                <dd class="text-stone-700">{{ $property->notes }}</dd>
+            </div>
+        @endif
         <div>
             <dt>สถานะ</dt>
             <dd>
@@ -59,6 +103,22 @@
     <div class="mt-4 grid grid-cols-2 gap-2">
         <a href="{{ route('properties.edit', $property) }}" class="as-action-primary">แก้ไขทรัพย์</a>
         <a href="{{ route('appointments.create', ['property_id' => $property->id]) }}" class="as-action-secondary">สร้างนัดดู</a>
+    </div>
+
+    <div class="mt-2">
+        <button type="button" data-share-single-property
+            data-name="{{ $property->name }}"
+            data-type="{{ $property->transaction_label }}"
+            data-price="{{ $property->formattedPrice() }}"
+            data-bedrooms="{{ $property->bedrooms }} ห้องนอน"
+            data-size="{{ $property->formattedSize() ?? '' }}"
+            data-location="{{ $property->location }}"
+            data-notes="{{ $property->notes ?? '' }}"
+            class="as-action-secondary flex w-full items-center justify-center gap-2 font-semibold">
+            <x-icon name="share" size="16" />
+            <span>แชร์ข้อมูลทรัพย์นี้</span>
+        </button>
+        <p class="mt-1.5 text-center text-xs text-stone-600" data-share-single-feedback aria-live="polite"></p>
     </div>
 
     {{-- Matching Clients --}}

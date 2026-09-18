@@ -11,7 +11,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['user_id', 'transaction_type', 'name', 'price', 'bedrooms', 'location', 'status'])]
+#[Fillable([
+    'user_id',
+    'transaction_type',
+    'name',
+    'price',
+    'bedrooms',
+    'location',
+    'status',
+    'owner_name',
+    'owner_phone',
+    'owner_line',
+    'size',
+    'floor',
+    'unit_number',
+    'notes',
+])]
 class Property extends Model
 {
     /** @use HasFactory<PropertyFactory> */
@@ -24,6 +39,7 @@ class Property extends Model
         return [
             'price' => 'decimal:2',
             'bedrooms' => 'integer',
+            'size' => 'decimal:2',
         ];
     }
 
@@ -67,5 +83,10 @@ class Property extends Model
     public function formattedPrice(): string
     {
         return number_format((float) $this->price, 0).' บาท';
+    }
+
+    public function formattedSize(): ?string
+    {
+        return $this->size !== null ? (float) $this->size.' ตร.ม.' : null;
     }
 }
