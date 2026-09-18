@@ -151,10 +151,44 @@ jobs:
           ln -s "$release" "$current_next"
           mv -Tf "$current_next" "$remote_base/current"
 
-          if [ -L "$public_path" ]; then
-            rm "$public_path"
-          elif [ -e "$public_path" ]; then
-            mv "$public_path" "${public_path}.legacy-${release_id}"
+          # Keep Laravel source outside the public web root, but make the
+          # domain's public_html a real, visible folder for Hostinger's File
+          # Manager. Each deploy refreshes these active public files.
+          public_next="${public_path}.next-${release_id}"
+          public_previous="${public_path}.previous-${release_id}"
+          case "$public_next" in
+            "${public_path}".next-*) ;;
+            *) echo "Invalid public deployment path" >&2; exit 1 ;;
+          esac
+
+          rm -rf "$public_next"
+          mkdir -p "$public_next"
+          rsync -a --delete "$remote_base/current/public/" "$public_next/"
+
+          cat > "$public_next/index.php" <<PHP
+          <?php
+
+          use Illuminate\\Foundation\\Application;
+          use Illuminate\\Http\\Request;
+
+          define('LARAVEL_START', microtime(true));
+
+          \$appRoot = '${remote_base}/current';
+
+          if (file_exists(\$maintenance = \$appRoot.'/storage/framework/maintenance.php')) {
+              require \$maintenance;
+          }
+
+          require \$appRoot.'/vendor/autoload.php';
+
+          /** @var Application \$app */
+          \$app = require_once \$appRoot.'/bootstrap/app.php';
+          \$app->handleRequest(Request::capture());
+          PHP
+
+          if [ -e "$public_path" ] || [ -L "$public_path" ]; then
+            mv -Tf "$public_path" "$public_previous"
           fi
-          ln -s "$remote_base/current/public" "$public_path"
+          mv -Tf "$public_next" "$public_path"
+          rm -rf "$public_previous"
           REMOTE
