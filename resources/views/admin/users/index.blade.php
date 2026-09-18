@@ -118,12 +118,12 @@
                             @method('PATCH')
                             @if ($user->plan === 'pro')
                                 <input type="hidden" name="plan" value="free" />
-                                <button type="submit" class="as-action-secondary px-3 py-1.5 text-xs text-stone-700" onclick="return confirm('ต้องการปรับแผนของ {{ $user->name }} เป็น FREE หรือไม่?')">
+                                <button type="submit" class="as-action-secondary px-3 py-1.5 text-xs text-stone-700">
                                     ปรับเป็น FREE
                                 </button>
                             @else
                                 <input type="hidden" name="plan" value="pro" />
-                                <button type="submit" class="as-action-primary px-3 py-1.5 text-xs" onclick="return confirm('ต้องการอัปเกรดแผนของ {{ $user->name }} เป็น PRO หรือไม่?')">
+                                <button type="submit" class="as-action-primary px-3 py-1.5 text-xs">
                                     อัปเกรดเป็น PRO
                                 </button>
                             @endif

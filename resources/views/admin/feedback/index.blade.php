@@ -148,7 +148,6 @@
                             <button
                                 type="submit"
                                 class="text-xs text-red-600 hover:text-red-800 p-1"
-                                onclick="return confirm('ยืนยันการลบข้อเสนอแนะนี้หรือไม่?')"
                             >
                                 ลบรายการ
                             </button>

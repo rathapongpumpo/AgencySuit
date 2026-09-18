@@ -177,7 +177,6 @@
                         <button
                             type="submit"
                             class="text-xs font-medium text-red-600 hover:text-red-800 p-1"
-                            onclick="return confirm('ยืนยันล้างรายการติดตามทั้งหมดของลูกค้ารายนี้หรือไม่?')"
                         >
                             ล้างทั้งหมด
                         </button>
@@ -203,7 +202,7 @@
                                     <form method="POST" action="{{ route('followups.destroy', $followUp) }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="text-xs text-red-500 hover:text-red-700 p-1" type="submit" title="ลบรายการนี้" onclick="return confirm('ต้องการลบรายการติดตามนี้?')">
+                                        <button class="text-xs text-red-500 hover:text-red-700 p-1" type="submit" title="ลบรายการนี้">
                                             <x-icon name="trash" size="14" />
                                         </button>
                                     </form>
@@ -230,7 +229,7 @@
                                         <form method="POST" action="{{ route('followups.destroy', $followUp) }}">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="text-stone-400 hover:text-red-500 p-1" type="submit" title="ลบรายการนี้" onclick="return confirm('ต้องการลบรายการติดตามนี้?')">
+                                            <button class="text-stone-400 hover:text-red-500 p-1" type="submit" title="ลบรายการนี้">
                                                 <x-icon name="trash" size="13" />
                                             </button>
                                         </form>

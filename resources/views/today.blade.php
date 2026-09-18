@@ -37,7 +37,7 @@
                                     </form>
                                     <form method="POST" action="{{ route('followups.destroy', $followUp) }}">
                                         @csrf @method('DELETE')
-                                        <button class="as-row-control text-stone-400 hover:text-red-600 hover:border-red-300 hover:bg-red-50" type="submit" title="ลบรายการนี้" onclick="return confirm('ต้องการลบรายการติดตามนี้?')"><x-icon name="trash" size="14" />ลบ</button>
+                                        <button class="as-row-control text-stone-400 hover:text-red-600 hover:border-red-300 hover:bg-red-50" type="submit" title="ลบรายการนี้"><x-icon name="trash" size="14" />ลบ</button>
                                     </form>
                                 </div>
                             </div>
@@ -91,7 +91,7 @@
                                     </form>
                                     <form method="POST" action="{{ route('followups.destroy', $followUp) }}">
                                         @csrf @method('DELETE')
-                                        <button class="as-row-control text-stone-400 hover:text-red-600 hover:border-red-300 hover:bg-red-50" type="submit" title="ลบรายการนี้" onclick="return confirm('ต้องการลบรายการติดตามนี้?')"><x-icon name="trash" size="14" />ลบ</button>
+                                        <button class="as-row-control text-stone-400 hover:text-red-600 hover:border-red-300 hover:bg-red-50" type="submit" title="ลบรายการนี้"><x-icon name="trash" size="14" />ลบ</button>
                                     </form>
                                 </div>
                             </div>
