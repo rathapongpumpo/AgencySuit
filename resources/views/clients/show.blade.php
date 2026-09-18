@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', $client->name.' | AgencySuit')
 
@@ -207,7 +207,7 @@
                             <span class="as-check"><x-icon name="briefcase" size="15" /></span>
                             <div class="as-row-body">
                                 <span class="as-row-title">{{ $deal->stageLabel() }}</span>
-                                <span class="as-row-meta">{{ $deal->property ? $deal->property->name : ' }} {{ $deal->amount ? '· มูลค่า '.number_format((float) $deal->amount, 0).' บาท' : ' }}</span>
+                                <span class="as-row-meta">{{ $deal->property?->name }} @if($deal->amount) · มูลค่า {{ number_format((float) $deal->amount, 0) }} บาท @endif</span>
                             </div>
                             <x-icon name="chevron-right" size="18" class="as-row-chevron" />
                         </a>
