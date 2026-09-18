@@ -73,4 +73,12 @@ class FollowUpController extends Controller
 
         return back()->with('success', 'ลบรายการติดตามแล้ว');
     }
+
+    public function destroyAll(Request $request, Client $client): RedirectResponse
+    {
+        Gate::authorize('update', $client);
+        $client->followUps()->delete();
+
+        return back()->with('success', 'ล้างประวัติติดตามทั้งหมดของลูกค้านี้เรียบร้อยแล้ว');
+    }
 }

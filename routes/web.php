@@ -50,6 +50,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/clients/create', [ClientController::class, 'create'])->name('clients.create');
     Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
     Route::post('/clients/{client}/follow-ups', [FollowUpController::class, 'store'])->name('clients.followups.store');
+    Route::delete('/clients/{client}/follow-ups', [FollowUpController::class, 'destroyAll'])->name('clients.followups.destroy-all');
     Route::get('/follow-ups/create', [FollowUpController::class, 'create'])->name('followups.create');
     Route::post('/follow-ups', [FollowUpController::class, 'storeQuickAdd'])->name('followups.store');
     Route::get('/clients/{client}/appointments/create', [AppointmentController::class, 'create'])->name('clients.appointments.create');

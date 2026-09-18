@@ -158,37 +158,84 @@
             @error('due_date')<p class="text-xs text-red-700">{{ $message }}</p>@enderror
         </form>
 
+        @php
+            $pendingFollowUps = $client->followUps->where('status', 'pending');
+            $completedFollowUps = $client->followUps->where('status', 'completed');
+        @endphp
+
         @if ($client->followUps->isNotEmpty())
             <div class="mt-4 border-t border-stone-100 pt-3">
-                <p class="text-xs font-bold text-stone-500">ประวัติติดตามล่าสุด</p>
-                <ul class="mt-2 divide-y divide-stone-100">
-                    @foreach ($client->followUps->take(5) as $followUp)
-                        <li class="flex items-center justify-between py-2 text-sm" id="followup-row-{{ $followUp->id }}">
-                            <div class="min-w-0 pr-2">
-                                <span class="{{ $followUp->status === 'completed' ? 'text-stone-400 line-through' : 'font-semibold text-stone-800' }}">{{ $followUp->due_date->format('d/m/Y') }}</span>
-                                @if($followUp->note)<span class="block truncate text-xs text-stone-500">{{ $followUp->note }}</span>@endif
-                            </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                @if ($followUp->status === 'pending')
+                <div class="flex items-center justify-between">
+                    <p class="text-xs font-bold text-stone-700">รายการที่ต้องติดตาม ({{ $pendingFollowUps->count() }})</p>
+                    <form method="POST" action="{{ route('clients.followups.destroy-all', $client) }}">
+                        @csrf
+                        @method('DELETE')
+                        <button
+                            type="submit"
+                            class="text-xs font-medium text-red-600 hover:text-red-800 p-1"
+                            onclick="return confirm('ยืนยันล้างรายการติดตามทั้งหมดของลูกค้ารายนี้หรือไม่?')"
+                        >
+                            ล้างทั้งหมด
+                        </button>
+                    </form>
+                </div>
+
+                @if ($pendingFollowUps->isEmpty())
+                    <p class="mt-2 text-xs text-stone-400">ไม่มีรายการค้างติดตาม</p>
+                @else
+                    <ul class="mt-2 divide-y divide-stone-100">
+                        @foreach ($pendingFollowUps as $followUp)
+                            <li class="flex items-center justify-between py-2 text-sm" id="followup-row-{{ $followUp->id }}">
+                                <div class="min-w-0 pr-2">
+                                    <span class="font-semibold text-stone-800">{{ $followUp->due_date->format('d/m/Y') }}</span>
+                                    @if($followUp->note)<span class="block truncate text-xs text-stone-500">{{ $followUp->note }}</span>@endif
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0">
                                     <form method="POST" action="{{ route('followups.complete', $followUp) }}">
                                         @csrf
                                         @method('PATCH')
                                         <button class="as-inline-action px-2 py-1 text-xs" type="submit">ทำแล้ว</button>
                                     </form>
-                                @else
-                                    <span class="text-xs text-stone-400">เสร็จแล้ว</span>
-                                @endif
-                                <form method="POST" action="{{ route('followups.destroy', $followUp) }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="text-xs text-red-500 hover:text-red-700 p-1" type="submit" title="ลบรายการนี้" onclick="return confirm('ต้องการลบรายการติดตามนี้?')">
-                                        <x-icon name="trash" size="14" />
-                                    </button>
-                                </form>
-                            </div>
-                        </li>
-                    @endforeach
-                </ul>
+                                    <form method="POST" action="{{ route('followups.destroy', $followUp) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="text-xs text-red-500 hover:text-red-700 p-1" type="submit" title="ลบรายการนี้" onclick="return confirm('ต้องการลบรายการติดตามนี้?')">
+                                            <x-icon name="trash" size="14" />
+                                        </button>
+                                    </form>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+
+                @if ($completedFollowUps->isNotEmpty())
+                    <details class="mt-3 border-t border-stone-100 pt-2 text-xs">
+                        <summary class="cursor-pointer font-medium text-stone-500 hover:text-stone-700 py-1">
+                            ดูประวัติที่เสร็จแล้ว ({{ $completedFollowUps->count() }} รายการ)
+                        </summary>
+                        <ul class="mt-1 divide-y divide-stone-100 text-stone-400">
+                            @foreach ($completedFollowUps as $followUp)
+                                <li class="flex items-center justify-between py-1.5">
+                                    <div class="min-w-0 pr-2">
+                                        <span class="line-through text-stone-400">{{ $followUp->due_date->format('d/m/Y') }}</span>
+                                        @if($followUp->note)<span class="block truncate text-[11px] text-stone-400">{{ $followUp->note }}</span>@endif
+                                    </div>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <span class="text-[11px] text-emerald-600 font-medium">เสร็จแล้ว</span>
+                                        <form method="POST" action="{{ route('followups.destroy', $followUp) }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="text-stone-400 hover:text-red-500 p-1" type="submit" title="ลบรายการนี้" onclick="return confirm('ต้องการลบรายการติดตามนี้?')">
+                                                <x-icon name="trash" size="13" />
+                                            </button>
+                                        </form>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </details>
+                @endif
             </div>
         @endif
     </section>
