@@ -8,15 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint ): void {
-            ->boolean('is_admin')->default(false)->after('plan')->index();
+        Schema::table('users', function (Blueprint $table): void {
+            $table->boolean('is_admin')->default(false)->after('plan')->index();
         });
     }
 
     public function down(): void
     {
-        Schema::table('users', function (Blueprint ): void {
-            ->dropColumn('is_admin');
+        Schema::table('users', function (Blueprint $table): void {
+            $table->dropColumn('is_admin');
         });
     }
 };
