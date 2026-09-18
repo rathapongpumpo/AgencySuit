@@ -38,7 +38,9 @@ return [
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect' => env('GOOGLE_REDIRECT_URI'),
+        // Keep the callback predictable for local development. A custom URI is
+        // still supported for staging/production through the environment.
+        'redirect' => env('GOOGLE_REDIRECT_URI') ?: rtrim(env('APP_URL', 'http://localhost:8000'), '/').'/auth/google/callback',
     ],
 
 ];

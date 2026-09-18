@@ -36,6 +36,22 @@ Important:
 4. Run `php artisan migrate` for local development, then `php artisan test` for automated tests.
 5. Run `npm run build` for the frontend bundle.
 
+### Enable Google login locally
+
+Google login needs an OAuth 2.0 Web application client from Google Cloud. Add
+the client ID and secret to `.env` (never commit them):
+
+```dotenv
+GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-client-secret
+GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback
+```
+
+Register the exact same redirect URI in Google Cloud. If
+`GOOGLE_REDIRECT_URI` is omitted, the app derives it from `APP_URL`. Without
+the client ID and secret, the login page intentionally keeps email login
+available and shows a setup message.
+
 Automated tests must never use the production/shared database (`194.59.164.72` / `propagent`). The database safety guard aborts tests and destructive commands when those values are configured.
 
 ## Release flow

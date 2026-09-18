@@ -175,6 +175,19 @@ class AuthenticationTest extends TestCase
             ->assertSessionHas('auth.google_oauth_state');
     }
 
+    public function test_google_redirect_uri_defaults_to_app_url_when_not_explicitly_configured(): void
+    {
+        config([
+            'services.google.client_id' => 'test-client-id',
+            'services.google.client_secret' => 'test-client-secret',
+        ]);
+
+        $expectedRedirect = rtrim((string) config('app.url'), '/').'/auth/google/callback';
+
+        $this->get(route('google.redirect'))
+            ->assertRedirectContains(rawurlencode($expectedRedirect));
+    }
+
     private function fakeSuccessfulGoogleCallback(string $email, string $id): void
     {
         config([
