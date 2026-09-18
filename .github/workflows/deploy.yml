@@ -191,4 +191,10 @@ jobs:
           fi
           mv -Tf "$public_next" "$public_path"
           rm -rf "$public_previous"
+
+          cat > "$public_path/DEPLOYMENT.txt" <<EOF
+          AgencySuit deployment
+          Commit: $release_id
+          Deployed UTC: $(date -u '+%Y-%m-%dT%H:%M:%SZ')
+          EOF
           REMOTE
