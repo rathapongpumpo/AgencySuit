@@ -30,10 +30,16 @@
                             <div class="as-row-body">
                                 <a href="{{ route('clients.show', $followUp->client) }}" class="as-row-title">ติดตาม {{ $followUp->client->name }}</a>
                                 <span class="as-row-meta">{{ $followUp->note ?: 'เปิดหน้าลูกค้าเพื่อดูรายละเอียด' }}</span>
-                                <form method="POST" action="{{ route('followups.complete', $followUp) }}">
-                                    @csrf @method('PATCH')
-                                    <button class="as-row-control" type="submit"><x-icon name="check" size="16" />ทำแล้ว</button>
-                                </form>
+                                <div class="flex items-center gap-2">
+                                    <form method="POST" action="{{ route('followups.complete', $followUp) }}">
+                                        @csrf @method('PATCH')
+                                        <button class="as-row-control" type="submit"><x-icon name="check" size="14" />ทำแล้ว</button>
+                                    </form>
+                                    <form method="POST" action="{{ route('followups.destroy', $followUp) }}">
+                                        @csrf @method('DELETE')
+                                        <button class="as-row-control text-stone-400 hover:text-red-600 hover:border-red-300 hover:bg-red-50" type="submit" title="ลบรายการนี้" onclick="return confirm('ต้องการลบรายการติดตามนี้?')"><x-icon name="trash" size="14" />ลบ</button>
+                                    </form>
+                                </div>
                             </div>
                             <span class="as-row-time as-row-time--alert">{{ $followUp->due_date->format('d/m') }}</span>
                         </li>
@@ -78,10 +84,16 @@
                             <div class="as-row-body">
                                 <a href="{{ route('clients.show', $followUp->client) }}" class="as-row-title">{{ $followUp->client->name }}</a>
                                 <span class="as-row-meta">{{ $followUp->note ?: 'กลับไปคุยกับลูกค้ารายนี้' }}</span>
-                                <form method="POST" action="{{ route('followups.complete', $followUp) }}">
-                                    @csrf @method('PATCH')
-                                    <button class="as-row-control" type="submit"><x-icon name="check" size="16" />ทำแล้ว</button>
-                                </form>
+                                <div class="flex items-center gap-2">
+                                    <form method="POST" action="{{ route('followups.complete', $followUp) }}">
+                                        @csrf @method('PATCH')
+                                        <button class="as-row-control" type="submit"><x-icon name="check" size="14" />ทำแล้ว</button>
+                                    </form>
+                                    <form method="POST" action="{{ route('followups.destroy', $followUp) }}">
+                                        @csrf @method('DELETE')
+                                        <button class="as-row-control text-stone-400 hover:text-red-600 hover:border-red-300 hover:bg-red-50" type="submit" title="ลบรายการนี้" onclick="return confirm('ต้องการลบรายการติดตามนี้?')"><x-icon name="trash" size="14" />ลบ</button>
+                                    </form>
+                                </div>
                             </div>
                         </li>
                     @endforeach

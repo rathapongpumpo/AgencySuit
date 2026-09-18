@@ -1,9 +1,9 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'แก้ไขนัดดู | AgencySuit')
 
 @section('content')
-    <a href="{{ route('appointments.show', $appointment) }}" class="as-back-link"><x-icon name="chevron-right" size="18" class="rotate-180" />รายละเอียดนัดดู</a>
+    <x-back-button :fallback="route('appointments.show', $appointment)" label="ย้อนกลับ" />
     <h1 class="as-detail-title">แก้ไขนัดดู</h1>
     <form method="POST" action="{{ route('appointments.update', $appointment) }}" class="as-form mt-7" novalidate>
         @csrf @method('PUT')
@@ -14,4 +14,21 @@
         <div class="as-field"><label for="note" class="as-field-label">หมายเหตุ (ถ้ามี)</label><textarea id="note" name="note" rows="2" maxlength="300" class="as-textarea">{{ old('note', $appointment->note) }}</textarea></div>
         <button type="submit" class="as-action-primary">บันทึกการแก้ไข</button>
     </form>
+
+    <div class="mt-8 border-t border-stone-200 pt-6">
+        <button type="button" class="as-action-danger" onclick="document.getElementById('del-apt-dialog').showModal()">ลบนัดดูนี้</button>
+    </div>
+
+    <dialog id="del-apt-dialog" class="as-confirm-dialog" aria-labelledby="del-apt-title">
+        <h3 id="del-apt-title" class="as-section-title">ต้องการลบนัดดูนี้?</h3>
+        <p class="as-page-subtitle">รายการนัดดูนี้จะถูกลบออกจากระบบอย่างถาวร</p>
+        <div class="mt-5 grid grid-cols-2 gap-2">
+            <button type="button" class="as-action-secondary" onclick="document.getElementById('del-apt-dialog').close()">ยกเลิก</button>
+            <form method="POST" action="{{ route('appointments.destroy', $appointment) }}">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="as-action-danger">ยืนยันลบ</button>
+            </form>
+        </div>
+    </dialog>
 @endsection

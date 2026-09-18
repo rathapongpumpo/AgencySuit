@@ -16,4 +16,9 @@ class FollowUpPolicy
     {
         return $user->id === $followUp->user_id;
     }
+
+    public function delete(User $user, FollowUp $followUp): bool
+    {
+        return $user->id === $followUp->user_id;
+    }
 }

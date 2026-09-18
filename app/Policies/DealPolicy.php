@@ -16,4 +16,9 @@ class DealPolicy
     {
         return $user->id === $deal->user_id;
     }
+
+    public function delete(User $user, Deal $deal): bool
+    {
+        return $user->id === $deal->user_id;
+    }
 }

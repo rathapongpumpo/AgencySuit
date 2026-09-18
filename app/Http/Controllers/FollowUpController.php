@@ -57,4 +57,20 @@ class FollowUpController extends Controller
 
         return back()->with('success', 'ทำรายการติดตามแล้ว');
     }
+
+    public function destroy(Request $request, FollowUp $followUp): RedirectResponse|JsonResponse
+    {
+        Gate::authorize('delete', $followUp);
+        $followUp->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'ลบรายการติดตามแล้ว',
+                'id' => $followUp->id,
+            ]);
+        }
+
+        return back()->with('success', 'ลบรายการติดตามแล้ว');
+    }
 }

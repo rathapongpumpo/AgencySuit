@@ -3,7 +3,7 @@
 @section('title', 'สร้างนัดดู | AgencySuit')
 
 @section('content')
-    <a href="{{ request('client_id') ? route('clients.show', request('client_id')) : route('today') }}" class="as-back-link"><x-icon name="chevron-right" size="18" class="rotate-180" />กลับ</a>
+    <x-back-button :fallback="request('client_id') ? route('clients.show', request('client_id')) : (request('property_id') ? route('properties.show', request('property_id')) : route('today'))" label="ย้อนกลับ" />
     <h1 class="as-detail-title">สร้างนัดดู</h1>
     <p class="as-page-subtitle">เลือกคน ทรัพย์ วันที่ และเวลา แล้วนัดจะขึ้นในวันนี้เมื่อถึงกำหนด</p>
     @if ($clients->isEmpty() || $properties->isEmpty())

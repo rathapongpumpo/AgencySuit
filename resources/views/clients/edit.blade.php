@@ -3,7 +3,7 @@
 @section('title', 'แก้ไขลูกค้า | AgencySuit')
 
 @section('content')
-    <a href="{{ route('clients.show', $client) }}" class="as-back-link"><x-icon name="chevron-right" size="18" class="rotate-180" />รายละเอียดลูกค้า</a>
+    <x-back-button :fallback="route('clients.show', $client)" label="ย้อนกลับ" />
     <h1 class="as-detail-title">แก้ไขลูกค้า</h1>
     <p class="as-page-subtitle">แก้ข้อมูลหลักได้ทันที หรือเปิดรายละเอียดเพิ่มเติมเมื่อจำเป็น</p>
 
@@ -85,4 +85,21 @@
 
         <button type="submit" class="as-action-primary">บันทึกการแก้ไข</button>
     </form>
+
+    <div class="mt-8 border-t border-stone-200 pt-6">
+        <button type="button" class="as-action-danger" onclick="document.getElementById('delete-client-dialog').showModal()">ลบข้อมูลลูกค้านี้</button>
+    </div>
+
+    <dialog id="delete-client-dialog" class="as-confirm-dialog" aria-labelledby="del-client-title">
+        <h3 id="del-client-title" class="as-section-title">ต้องการลบลูกค้ารายนี้?</h3>
+        <p class="as-page-subtitle">ข้อมูลของ "{{ $client->name }}" นัดหมาย และรายการติดตามทั้งหมดจะถูกลบออกจากระบบ</p>
+        <div class="mt-5 grid grid-cols-2 gap-2">
+            <button type="button" class="as-action-secondary" onclick="document.getElementById('delete-client-dialog').close()">ยกเลิก</button>
+            <form method="POST" action="{{ route('clients.destroy', $client) }}">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="as-action-danger">ยืนยันลบ</button>
+            </form>
+        </div>
+    </dialog>
 @endsection

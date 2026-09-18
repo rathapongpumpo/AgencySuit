@@ -3,7 +3,7 @@
 @section('title', 'เพิ่มลูกค้า | AgencySuit')
 
 @section('content')
-    <a href="{{ route('clients.index') }}" class="as-back-link"><x-icon name="chevron-right" size="18" class="rotate-180" />ลูกค้า</a>
+    <x-back-button :fallback="route('clients.index')" label="ย้อนกลับ" />
     <h1 class="as-detail-title">เพิ่มลูกค้า</h1>
     <p class="as-page-subtitle">บันทึกข้อมูลหลัก 4 ช่องก่อน รายละเอียดอื่นเพิ่มทีหลังได้</p>
 

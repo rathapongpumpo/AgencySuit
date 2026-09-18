@@ -16,4 +16,9 @@ class AppointmentPolicy
     {
         return $user->id === $appointment->user_id;
     }
+
+    public function delete(User $user, Appointment $appointment): bool
+    {
+        return $user->id === $appointment->user_id;
+    }
 }

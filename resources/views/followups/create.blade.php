@@ -3,7 +3,7 @@
 @section('title', 'ติดตามอีกครั้ง | AgencySuit')
 
 @section('content')
-    <a href="{{ route('today') }}" class="as-back-link"><x-icon name="chevron-right" size="18" class="rotate-180" />วันนี้</a>
+    <x-back-button :fallback="route('today')" label="ย้อนกลับ" />
     <h1 class="as-detail-title">ติดตามอีกครั้ง</h1>
     <p class="as-page-subtitle">เลือก ลูกค้า และช่วงเวลาสั้น ๆ ระบบจะนำไปแสดงบนวันนี้</p>
     @if ($clients->isEmpty())

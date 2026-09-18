@@ -74,4 +74,12 @@ class ClientController extends Controller
 
         return to_route('clients.show', $client)->with('success', 'แก้ไขข้อมูลลูกค้าแล้ว');
     }
+
+    public function destroy(Client $client): RedirectResponse
+    {
+        Gate::authorize('delete', $client);
+        $client->delete();
+
+        return to_route('clients.index')->with('success', 'ลบข้อมูลลูกค้าเรียบร้อยแล้ว');
+    }
 }

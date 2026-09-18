@@ -74,4 +74,12 @@ class AppointmentController extends Controller
 
         return to_route('appointments.show', $appointment)->with('success', 'ยกเลิกนัดดูแล้ว');
     }
+
+    public function destroy(Appointment $appointment): RedirectResponse
+    {
+        Gate::authorize('delete', $appointment);
+        $appointment->delete();
+
+        return to_route('today')->with('success', 'ลบนัดดูเรียบร้อยแล้ว');
+    }
 }

@@ -3,7 +3,7 @@
 @section('title', 'แก้ไขทรัพย์ | AgencySuit')
 
 @section('content')
-    <a href="{{ route('properties.show', $property) }}" class="as-back-link"><x-icon name="chevron-right" size="18" class="rotate-180" />รายละเอียดทรัพย์</a>
+    <x-back-button :fallback="route('properties.show', $property)" label="ย้อนกลับ" />
     <h1 class="as-detail-title">แก้ไขทรัพย์</h1>
     <p class="as-page-subtitle">แก้เฉพาะข้อมูลหลักของทรัพย์รายการนี้</p>
 
@@ -50,4 +50,21 @@
 
         <button type="submit" class="as-action-primary">บันทึกการแก้ไข</button>
     </form>
+
+    <div class="mt-8 border-t border-stone-200 pt-6">
+        <button type="button" class="as-action-danger" onclick="document.getElementById('delete-property-dialog').showModal()">ลบทรัพย์นี้</button>
+    </div>
+
+    <dialog id="delete-property-dialog" class="as-confirm-dialog" aria-labelledby="del-title">
+        <h3 id="del-title" class="as-section-title">ต้องการลบทรัพย์นี้?</h3>
+        <p class="as-page-subtitle">ทรัพย์ "{{ $property->name }}" และรูปภาพทั้งหมดจะถูกลบออกจากระบบ</p>
+        <div class="mt-5 grid grid-cols-2 gap-2">
+            <button type="button" class="as-action-secondary" onclick="document.getElementById('delete-property-dialog').close()">ยกเลิก</button>
+            <form method="POST" action="{{ route('properties.destroy', $property) }}">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="as-action-danger">ยืนยันลบ</button>
+            </form>
+        </div>
+    </dialog>
 @endsection

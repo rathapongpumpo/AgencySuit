@@ -84,6 +84,19 @@ class PropertyController extends Controller
         return to_route('properties.show', $property)->with('success', 'แก้ไขทรัพย์แล้ว');
     }
 
+    public function destroy(Property $property): RedirectResponse
+    {
+        Gate::authorize('delete', $property);
+
+        foreach ($property->photos as $photo) {
+            Storage::disk('local')->delete(array_filter([$photo->path, $photo->thumbnail_path]));
+        }
+
+        $property->delete();
+
+        return to_route('properties.index')->with('success', 'ลบทรัพย์เรียบร้อยแล้ว');
+    }
+
     public function updateStatus(PropertyStatusRequest $request, Property $property): RedirectResponse|JsonResponse
     {
         Gate::authorize('update', $property);

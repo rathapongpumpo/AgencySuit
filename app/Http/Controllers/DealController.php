@@ -77,4 +77,13 @@ class DealController extends Controller
 
         return to_route('deals.show', $deal)->with('success', 'แก้ไขดีลแล้ว');
     }
+
+    public function destroy(Deal $deal): RedirectResponse
+    {
+        Gate::authorize('delete', $deal);
+        $client = $deal->client;
+        $deal->delete();
+
+        return to_route('clients.show', $client)->with('success', 'ลบดีลเรียบร้อยแล้ว');
+    }
 }

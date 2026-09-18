@@ -3,7 +3,7 @@
 @section('title', 'สร้างดีล | AgencySuit')
 
 @section('content')
-    <a href="{{ route('clients.show', $client) }}" class="as-back-link"><x-icon name="chevron-right" size="18" class="rotate-180" />ลูกค้า</a>
+    <x-back-button :fallback="route('clients.show', $client)" label="ย้อนกลับ" />
     <h1 class="as-detail-title">สร้างดีล</h1>
     @if(session('limit_reached'))<p role="alert" class="as-alert as-alert--warning mt-5">{{ session('limit_reached') }}</p>@endif
     <form method="POST" action="{{ route('clients.deals.store', $client) }}" class="as-form mt-7" novalidate>@csrf

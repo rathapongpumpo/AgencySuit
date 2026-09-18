@@ -3,7 +3,7 @@
 @section('title', 'แผนการใช้งาน | AgencySuit')
 
 @section('content')
-    <a href="{{ route('more') }}" class="as-back-link"><x-icon name="chevron-right" size="18" class="rotate-180" />เพิ่มเติม</a>
+    <x-back-button :fallback="route('more')" label="ย้อนกลับ" />
     <div class="as-detail-hero">
         <h1 class="as-detail-title">Agent Pocket Pro</h1>
         <p class="as-page-subtitle">ซื้อครั้งเดียว ปลดข้อจำกัด Free เมื่อระบบชำระเงินพร้อมใช้งาน</p>

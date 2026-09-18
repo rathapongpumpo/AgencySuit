@@ -3,7 +3,7 @@
 @section('title', 'เพิ่มทรัพย์ | AgencySuit')
 
 @section('content')
-    <a href="{{ route('properties.index') }}" class="as-back-link"><x-icon name="chevron-right" size="18" class="rotate-180" />ทรัพย์</a>
+    <x-back-button :fallback="route('properties.index')" label="ย้อนกลับ" />
     <h1 class="as-detail-title">เพิ่มทรัพย์</h1>
     <p class="as-page-subtitle">กรอกข้อมูลหลัก 5 ช่อง แล้วแก้ไขรายละเอียดเพิ่มเติมได้ภายหลัง</p>
 
