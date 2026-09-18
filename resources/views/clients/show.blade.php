@@ -97,8 +97,10 @@
         @else
             <ul>
                 @foreach ($propertyMatches as $match)
-                    @php($property = $match['property'])
-                    @php($primaryPhoto = $property->primaryPhoto)
+                    @php
+                        $property = $match['property'];
+                        $primaryPhoto = $property->primaryPhoto;
+                    @endphp
                     <li>
                         <a href="{{ route('properties.show', $property) }}" class="as-work-row">
                             @if ($primaryPhoto)
@@ -121,7 +123,9 @@
                 <form data-share-form class="space-y-3">
                     <p class="text-xs font-bold text-stone-700">เลือกทรัพย์ที่ต้องการส่งให้ลูกค้า:</p>
                     @foreach ($propertyMatches as $match)
-                        @php($shareProperty = $match['property'])
+                        @php
+                            $shareProperty = $match['property'];
+                        @endphp
                         <label class="flex items-center gap-2 text-sm text-stone-700">
                             <input type="checkbox" class="size-4 rounded text-teal-700" data-share-property data-share-name="{{ $shareProperty->name }}" data-share-type="{{ $shareProperty->transaction_label }}" data-share-price="{{ $shareProperty->formattedPrice() }}" data-share-bedrooms="{{ $shareProperty->bedrooms }}" data-share-location="{{ $shareProperty->location }}">
                             <span class="truncate">{{ $shareProperty->name }} ({{ $shareProperty->formattedPrice() }})</span>
