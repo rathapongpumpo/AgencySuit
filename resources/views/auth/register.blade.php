@@ -8,7 +8,10 @@
         <p class="as-guest-copy">เริ่มต้นด้วยอีเมลและรหัสผ่าน แล้วค่อยเติม workflow ของคุณทีละขั้น</p>
         @include('auth.partials.messages')
 
-        <form method="POST" action="{{ route('register.store') }}" class="as-form mt-7" novalidate>
+        <a href="{{ route('google.redirect') }}" class="as-action-secondary mt-7"><span class="font-bold text-teal-800">G</span>ดำเนินการต่อด้วย Google</a>
+        <div class="as-divider">หรือ</div>
+
+        <form method="POST" action="{{ route('register.store') }}" class="as-form" novalidate>
             @csrf
             <div class="as-field">
                 <label for="email" class="as-field-label">อีเมล</label>

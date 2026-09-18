@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use Throwable;
 
@@ -28,6 +29,11 @@ class GoogleOAuthController extends Controller
     public function callback(Request $request, GoogleOAuthService $google): RedirectResponse
     {
         if ($request->filled('error')) {
+            Log::warning('Google OAuth returned error parameter', [
+                'error' => $request->input('error'),
+                'error_description' => $request->input('error_description'),
+            ]);
+
             return redirect()->route('login')->withErrors([
                 'google' => 'ไม่สามารถเข้าสู่ระบบด้วย Google ได้ กรุณาลองใหม่หรือใช้อีเมล',
             ]);
@@ -42,7 +48,11 @@ class GoogleOAuthController extends Controller
         try {
             $identity = $google->identityFromCallback($request);
             $user = $this->findOrCreateUser($identity);
-        } catch (Throwable) {
+        } catch (Throwable $e) {
+            Log::error('Google OAuth callback failed: '.$e->getMessage(), [
+                'exception' => $e,
+            ]);
+
             return redirect()->route('login')->withErrors([
                 'google' => 'ไม่สามารถเข้าสู่ระบบด้วย Google ได้ กรุณาลองใหม่หรือใช้อีเมล',
             ]);
