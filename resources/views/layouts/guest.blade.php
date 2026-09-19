@@ -14,13 +14,17 @@
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endunless
     </head>
-    <body>
-        <main class="as-guest-shell">
-            <a href="{{ url('/') }}" class="as-guest-brand">
-                <span class="as-brand-mark">AS</span>
-                <span>AgencySuit</span>
-            </a>
-            @yield('content')
-        </main>
+    <body class="as-auth-body">
+        <div class="as-auth-wrapper">
+            <header class="as-auth-topbar">
+                <a href="{{ url('/') }}" class="as-auth-brand" aria-label="AgencySuit หน้าหลัก">
+                    <span class="as-brand-mark">AS</span>
+                    <span class="as-brand-name">AgencySuit</span>
+                </a>
+            </header>
+            <main class="as-auth-main">
+                @yield('content')
+            </main>
+        </div>
     </body>
 </html>

@@ -8,7 +8,17 @@ document.querySelectorAll('[data-password-toggle]').forEach((button) => {
 
         const visible = input.type === 'text';
         input.type = visible ? 'password' : 'text';
-        button.textContent = visible ? 'แสดง' : 'ซ่อน';
+
+        const eyeIcon = button.querySelector('.toggle-icon-eye');
+        const eyeOffIcon = button.querySelector('.toggle-icon-eye-off');
+
+        if (eyeIcon && eyeOffIcon) {
+            eyeIcon.classList.toggle('hidden', !visible);
+            eyeOffIcon.classList.toggle('hidden', visible);
+            button.setAttribute('aria-label', visible ? 'แสดงรหัสผ่าน' : 'ซ่อนรหัสผ่าน');
+        } else {
+            button.textContent = visible ? 'แสดง' : 'ซ่อน';
+        }
     });
 });
 

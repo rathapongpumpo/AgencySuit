@@ -881,6 +881,211 @@ textarea.as-textarea {
     color: var(--as-teal-strong);
 }
 
+/* ==========================================================================
+   Auth / Guest Views (Linear & Apple Reminders inspired)
+   ========================================================================== */
+
+.as-auth-body {
+    background: var(--as-canvas);
+    min-height: 100vh;
+}
+
+.as-auth-wrapper {
+    width: 100%;
+    max-width: 25.5rem;
+    min-height: 100vh;
+    margin: 0 auto;
+    padding: max(1.25rem, env(safe-area-inset-top, 0px)) 1.25rem max(2.5rem, env(safe-area-inset-bottom, 0px));
+    display: flex;
+    flex-direction: column;
+}
+
+.as-auth-topbar {
+    display: flex;
+    align-items: center;
+    padding-top: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.as-auth-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    text-decoration: none;
+    color: var(--as-ink);
+}
+
+.as-auth-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.as-auth-header {
+    margin-bottom: 1.5rem;
+}
+
+.as-auth-title {
+    margin: 0;
+    font-size: 1.625rem;
+    font-weight: 750;
+    letter-spacing: -0.025em;
+    color: var(--as-ink);
+    line-height: 1.2;
+}
+
+.as-auth-copy {
+    margin-top: 0.4rem;
+    font-size: 0.885rem;
+    color: var(--as-muted);
+    line-height: 1.5;
+}
+
+.as-btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.75rem 1.25rem;
+    background: #ffffff;
+    border: 1px solid var(--as-line);
+    border-radius: 12px;
+    color: var(--as-ink);
+    font-size: 0.925rem;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 1px 2px rgba(20, 28, 26, 0.04);
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.as-btn-google:hover {
+    border-color: #cbd5e1;
+    background: #fafbfa;
+}
+
+.as-btn-google:active {
+    transform: scale(0.985);
+    background: #f6f8f7;
+}
+
+.as-auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.35rem 0;
+    color: var(--as-faint);
+    font-size: 0.785rem;
+    font-weight: 500;
+}
+
+.as-auth-divider::before,
+.as-auth-divider::after {
+    height: 1px;
+    flex: 1;
+    background: var(--as-line);
+    content: '';
+}
+
+.as-auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.95rem;
+}
+
+.as-auth-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.as-auth-label {
+    font-size: 0.825rem;
+    font-weight: 600;
+    color: #2b3a36;
+    letter-spacing: -0.01em;
+}
+
+.as-auth-input {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.65rem 0.95rem;
+    background: #ffffff;
+    border: 1px solid #d4ded9;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    color: var(--as-ink);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.as-auth-input:focus {
+    outline: none;
+    border-color: var(--as-teal);
+    box-shadow: 0 0 0 3px rgba(20, 89, 84, 0.14);
+}
+
+.as-auth-input::placeholder {
+    color: #9cb0a8;
+}
+
+.as-auth-link {
+    color: var(--as-teal);
+    font-size: 0.825rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.as-auth-link:hover {
+    color: var(--as-teal-strong);
+    text-decoration: underline;
+}
+
+.as-checkbox {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 4px;
+    border: 1.5px solid #b8c5bf;
+    accent-color: var(--as-teal);
+    cursor: pointer;
+}
+
+.as-btn-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 3.1rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--as-teal);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.975rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(13, 67, 63, 0.18);
+    transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.as-btn-submit:hover {
+    background: var(--as-teal-strong);
+}
+
+.as-btn-submit:active {
+    transform: scale(0.985);
+    box-shadow: none;
+}
+
+.as-auth-footer {
+    margin-top: 1.75rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--as-muted);
+}
+
 .as-guest-shell {
     width: 100%;
     max-width: 34rem;

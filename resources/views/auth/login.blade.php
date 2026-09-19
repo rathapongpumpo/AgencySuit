@@ -3,30 +3,59 @@
 @section('title', 'เข้าสู่ระบบ | AgencySuit')
 
 @section('content')
-    <div class="as-guest-panel">
-        <h1 class="as-guest-title">กลับมาจัดงาน<br>ให้เดินต่อกัน</h1>
-        <p class="as-guest-copy">ทรัพย์ ลูกค้า นัดดู และสิ่งที่ต้องตามวันนี้ อยู่ในที่เดียว</p>
-        @include('auth.partials.messages')
-
-        <a href="{{ route('google.redirect') }}" class="as-action-secondary mt-7"><span class="font-bold text-teal-800">G</span>ดำเนินการต่อด้วย Google</a>
-        <div class="as-divider">หรือ</div>
-
-        <form method="POST" action="{{ route('login.store') }}" class="as-form" novalidate>
-            @csrf
-            <div class="as-field">
-                <label for="email" class="as-field-label">อีเมล</label>
-                <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" required autofocus class="as-input">
-            </div>
-            <div class="as-field">
-                <div class="flex items-center justify-between gap-3"><label for="password" class="as-field-label">รหัสผ่าน</label><a href="{{ route('password.request') }}" class="as-text-link text-sm">ลืมรหัสผ่าน?</a></div>
-                <div class="relative">
-                    <input id="password" name="password" type="password" autocomplete="current-password" required class="as-input pr-20">
-                    <button type="button" data-password-toggle="password" class="absolute inset-y-0 right-0 min-h-12 px-4 text-sm font-bold text-teal-800">แสดง</button>
-                </div>
-            </div>
-            <label class="flex min-h-11 items-center gap-3 text-sm text-stone-600"><input name="remember" type="checkbox" class="rounded border-stone-300 text-teal-800 focus:ring-teal-700">จำการเข้าสู่ระบบ</label>
-            <button type="submit" class="as-action-primary">เข้าสู่ระบบ</button>
-        </form>
-        <p class="mt-6 text-center text-sm text-stone-600">ยังไม่มีบัญชี? <a href="{{ route('register') }}" class="as-text-link">สมัครสมาชิก</a></p>
+    <div class="as-auth-header">
+        <h1 class="as-auth-title">เข้าสู่ระบบ</h1>
+        <p class="as-auth-copy">จัดการทรัพย์ ลูกค้า และงานประจำวันของคุณ</p>
     </div>
+
+    @include('auth.partials.messages')
+
+    <a href="{{ route('google.redirect') }}" class="as-btn-google">
+        <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24Z"/>
+            <path fill="#FBBC05" d="M5.28 14.27a7.22 7.22 0 0 1 0-4.54V6.58H1.25a11.98 11.98 0 0 0 0 10.84l4.03-3.15Z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"/>
+        </svg>
+        <span>เข้าสู่ระบบด้วย Google</span>
+    </a>
+
+    <div class="as-auth-divider">
+        <span>หรือใช้อีเมล</span>
+    </div>
+
+    <form method="POST" action="{{ route('login.store') }}" class="as-auth-form" novalidate>
+        @csrf
+        <div class="as-auth-field">
+            <label for="email" class="as-auth-label">อีเมล</label>
+            <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" required autofocus placeholder="name@example.com" class="as-auth-input">
+        </div>
+
+        <div class="as-auth-field">
+            <div class="flex items-center justify-between">
+                <label for="password" class="as-auth-label">รหัสผ่าน</label>
+                <a href="{{ route('password.request') }}" class="as-auth-link">ลืมรหัสผ่าน?</a>
+            </div>
+            <div class="relative">
+                <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="••••••••" class="as-auth-input pr-12">
+                <button type="button" data-password-toggle="password" aria-label="แสดงรหัสผ่าน" class="absolute inset-y-0 right-0 flex items-center justify-center px-3.5 text-stone-400 hover:text-stone-750 transition-colors">
+                    <x-icon name="eye" size="18" class="toggle-icon-eye" />
+                    <x-icon name="eye-off" size="18" class="toggle-icon-eye-off hidden" />
+                </button>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-0.5">
+            <label class="inline-flex cursor-pointer items-center gap-2 text-xs font-medium text-stone-600 select-none">
+                <input name="remember" type="checkbox" class="as-checkbox">
+                <span>จำการเข้าสู่ระบบ</span>
+            </label>
+        </div>
+
+        <button type="submit" class="as-btn-submit">เข้าสู่ระบบ</button>
+    </form>
+
+    <p class="as-auth-footer">
+        ยังไม่มีบัญชี? <a href="{{ route('register') }}" class="as-auth-link font-semibold">สมัครสมาชิก</a>
+    </p>
 @endsection
