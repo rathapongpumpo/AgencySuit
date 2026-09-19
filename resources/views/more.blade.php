@@ -45,46 +45,7 @@
         </a>
         <form method="POST" action="{{ route('logout') }}" class="border-t border-[var(--as-line)] px-4 py-2">
             @csrf
-            <button type="submit" class="min-h-11 text-sm font-bold text-red-700">ออกจากระบบ</button>
+            <button type="submit" class="min-h-11 text-sm font-bold text-red-400 hover:text-red-300">ออกจากระบบ</button>
         </form>
     </section>
-
-    <div class="mt-6">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-[var(--as-muted)] mb-2.5 px-1">ธีมการแสดงผล</h2>
-        <div class="as-surface p-3 grid grid-cols-2 gap-2.5">
-            <button type="button" data-set-theme="navy" class="as-theme-card" aria-pressed="false">
-                <div class="as-theme-preview" style="background: #f6f8fb; border-color: #cbd5e1;">
-                    <div class="flex items-center gap-1.5 mb-2">
-                        <span class="w-4 h-4 rounded-md shadow-xs" style="background: #0f172a;"></span>
-                        <span class="w-2.5 h-2.5 rounded-full" style="background: #c27803;"></span>
-                    </div>
-                    <div class="h-2 w-16 rounded bg-slate-200"></div>
-                </div>
-                <div class="as-theme-info">
-                    <span class="as-theme-title">Midnight Navy</span>
-                    <span class="as-theme-desc">คมชัด สไตล์ Linear</span>
-                </div>
-                <span class="as-theme-check" aria-hidden="true">
-                    <x-icon name="check" size="13" />
-                </span>
-            </button>
-
-            <button type="button" data-set-theme="pine" class="as-theme-card" aria-pressed="false">
-                <div class="as-theme-preview" style="background: #f8f7f4; border-color: #d1dad4;">
-                    <div class="flex items-center gap-1.5 mb-2">
-                        <span class="w-4 h-4 rounded-md shadow-xs" style="background: #1a2e26;"></span>
-                        <span class="w-2.5 h-2.5 rounded-full" style="background: #c86d51;"></span>
-                    </div>
-                    <div class="h-2 w-16 rounded bg-stone-200"></div>
-                </div>
-                <div class="as-theme-info">
-                    <span class="as-theme-title">Deep Pine</span>
-                    <span class="as-theme-desc">อบอุ่น สไตล์สถาปัตย์</span>
-                </div>
-                <span class="as-theme-check" aria-hidden="true">
-                    <x-icon name="check" size="13" />
-                </span>
-            </button>
-        </div>
-    </div>
 @endsection

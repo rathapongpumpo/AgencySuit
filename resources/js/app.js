@@ -592,32 +592,3 @@ document.querySelectorAll('form[data-feedback-destroy]').forEach((form) => {
         }
     });
 });
-
-// Theme Switcher
-const updateThemeUI = (theme) => {
-    document.querySelectorAll('[data-set-theme]').forEach((btn) => {
-        const isActive = btn.dataset.setTheme === theme;
-        btn.classList.toggle('is-active', isActive);
-        btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-    });
-};
-
-const currentTheme = localStorage.getItem('as_theme') || 'navy';
-document.documentElement.setAttribute('data-theme', currentTheme);
-updateThemeUI(currentTheme);
-
-document.querySelectorAll('[data-set-theme]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-        const theme = btn.dataset.setTheme;
-        localStorage.setItem('as_theme', theme);
-        document.documentElement.setAttribute('data-theme', theme);
-
-        const metaTheme = document.querySelector('meta[name="theme-color"]');
-        if (metaTheme) {
-            metaTheme.setAttribute('content', theme === 'pine' ? '#f8f7f4' : '#f6f8fb');
-        }
-
-        updateThemeUI(theme);
-        showToast(theme === 'pine' ? 'เปลี่ยนเป็นธีม Deep Pine แล้ว ✓' : 'เปลี่ยนเป็นธีม Midnight Navy แล้ว ✓');
-    });
-});
