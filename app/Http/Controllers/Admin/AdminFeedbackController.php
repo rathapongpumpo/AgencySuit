@@ -91,6 +91,6 @@ class AdminFeedbackController extends Controller
             ]);
         }
 
-        return back()->with('success', 'ลบข้อเสนอแนะเรียบร้อยแล้ว');
+        return redirect()->route('admin.feedback.index')->with('success', 'ลบข้อเสนอแนะเรียบร้อยแล้ว');
     }
 }

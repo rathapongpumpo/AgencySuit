@@ -565,8 +565,21 @@ document.querySelectorAll('form[data-photo-destroy]').forEach((form) => {
 // In-place Feedback Delete in Admin
 document.querySelectorAll('form[data-feedback-destroy]').forEach((form) => {
     form.addEventListener('submit', async (e) => {
+        const confirmMsg = form.dataset.confirm || 'ต้องการลบข้อเสนอแนะนี้ใช่หรือไม่?';
+        if (!window.confirm(confirmMsg)) {
+            e.preventDefault();
+            return;
+        }
+
         e.preventDefault();
-        const card = form.closest('.rounded-xl') || form.closest('article') || form.closest('div.border');
+
+        const btn = form.querySelector('button[type="submit"]');
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = 'กำลังลบ...';
+        }
+
+        const card = form.closest('[data-feedback-card]') || form.closest('.as-card');
 
         try {
             const res = await fetch(form.action, {
@@ -578,17 +591,33 @@ document.querySelectorAll('form[data-feedback-destroy]').forEach((form) => {
                 body: new FormData(form),
             });
 
-            if (res.ok) {
+            if (res.ok || res.status === 404) {
                 showToast('ลบข้อเสนอแนะแล้ว ✓');
                 if (card) {
                     card.classList.add('as-row-leaving');
-                    setTimeout(() => card.remove(), 280);
+                    setTimeout(() => {
+                        card.remove();
+                        const list = document.querySelector('[data-feedback-list]');
+                        if (list && list.querySelectorAll('[data-feedback-card]').length === 0) {
+                            window.location.reload();
+                        }
+                    }, 280);
+                } else {
+                    window.location.reload();
                 }
             } else {
-                form.submit();
+                showToast('ไม่สามารถลบข้อเสนอแนะได้');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'ลบรายการ';
+                }
             }
         } catch {
-            form.submit();
+            showToast('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'ลบรายการ';
+            }
         }
     });
 });

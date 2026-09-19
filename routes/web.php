@@ -105,6 +105,7 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
         Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
         Route::patch('/users/{user}/plan', [AdminUserController::class, 'updatePlan'])->name('users.update-plan');
         Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('feedback.index');
+        Route::get('/feedback/{any}', fn () => redirect()->route('admin.feedback.index'));
         Route::patch('/feedback/{feedback}/status', [AdminFeedbackController::class, 'updateStatus'])->name('feedback.update-status');
         Route::delete('/feedback/{feedback}', [AdminFeedbackController::class, 'destroy'])->name('feedback.destroy');
     });

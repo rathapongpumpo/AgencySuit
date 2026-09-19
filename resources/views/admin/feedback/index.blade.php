@@ -53,9 +53,9 @@
             <x-empty-state title="ไม่พบข้อเสนอแนะ" description="ลองเปลี่ยนคำค้นหา หรือกดล้างตัวกรองเพื่อดูทั้งหมด" action="ดูทั้งหมด" :action-url="route('admin.feedback.index')" />
         </div>
     @else
-        <div class="mt-4 space-y-3">
+        <div class="mt-4 space-y-3" data-feedback-list>
             @foreach ($feedbacks as $fb)
-                <div class="as-card space-y-2.5 p-3.5">
+                <div class="as-card space-y-2.5 p-3.5" data-feedback-card="{{ $fb->id }}">
                     {{-- Header: Type Badge, Status, Date --}}
                     <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5 flex-wrap">
@@ -112,7 +112,7 @@
                             </select>
                         </form>
 
-                        <form method="POST" action="{{ route('admin.feedback.destroy', $fb) }}" data-feedback-destroy>
+                        <form method="POST" action="{{ route('admin.feedback.destroy', $fb) }}" data-feedback-destroy data-confirm="ต้องการลบข้อเสนอแนะนี้ใช่หรือไม่?">
                             @csrf
                             @method('DELETE')
                             <button
