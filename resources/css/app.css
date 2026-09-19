@@ -8,17 +8,44 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-:root {
-    --as-canvas: #f6f8f7;
+:root,
+[data-theme="navy"] {
+    --as-canvas: #f6f8fb;
+    --as-surface: #ffffff;
+    --as-ink: #0f172a;
+    --as-muted: #596a80;
+    --as-faint: #94a3b8;
+    --as-line: #e2e8f0;
+    --as-teal: #0f172a;
+    --as-teal-strong: #020617;
+    --as-teal-soft: #f1f5f9;
+    --as-coral: #c27803;
+    --as-coral-soft: #fef3c7;
+    --as-warning: #b45309;
+    --as-warning-soft: #fffbeb;
+    --as-danger: #dc2626;
+    --as-danger-soft: #fef2f2;
+    --as-radius: 14px;
+    --as-control-radius: 10px;
+    --as-shadow-card: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
+    --as-shadow-float: 0 12px 28px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.04);
+    --as-scroll-thumb: #cbd5e1;
+    --as-focus-ring: rgba(15, 23, 42, 0.22);
+    --as-toast-bg: #0f172a;
+    --as-theme-name: 'navy';
+}
+
+[data-theme="pine"] {
+    --as-canvas: #f8f7f4;
     --as-surface: #ffffff;
     --as-ink: #141c1a;
     --as-muted: #5e6b66;
     --as-faint: #8e9b95;
     --as-line: #e3e8e5;
-    --as-teal: #145954;
-    --as-teal-strong: #0d433f;
-    --as-teal-soft: #eaf4f1;
-    --as-coral: #cf5b42;
+    --as-teal: #1a2e26;
+    --as-teal-strong: #0e1d17;
+    --as-teal-soft: #eaf0ed;
+    --as-coral: #c86d51;
     --as-coral-soft: #fcf0ec;
     --as-warning: #945f1b;
     --as-warning-soft: #fef7ed;
@@ -29,6 +56,9 @@
     --as-shadow-card: 0 1px 3px rgba(20, 28, 26, 0.04), 0 1px 2px rgba(20, 28, 26, 0.02);
     --as-shadow-float: 0 14px 32px rgba(20, 28, 26, 0.14), 0 2px 8px rgba(20, 28, 26, 0.04);
     --as-scroll-thumb: #b8c5bf;
+    --as-focus-ring: rgba(26, 46, 38, 0.25);
+    --as-toast-bg: #1a2e26;
+    --as-theme-name: 'pine';
 }
 
 @layer base {
@@ -85,7 +115,7 @@
     select:focus-visible,
     textarea:focus-visible,
     summary:focus-visible {
-        outline: 3px solid rgba(30, 91, 87, 0.28);
+        outline: 3px solid var(--as-focus-ring);
         outline-offset: 2px;
     }
 }
@@ -1012,7 +1042,7 @@ textarea.as-textarea {
     min-height: 3rem;
     padding: 0.65rem 0.95rem;
     background: #ffffff;
-    border: 1px solid #d4ded9;
+    border: 1px solid var(--as-line);
     border-radius: 12px;
     font-size: 0.95rem;
     color: var(--as-ink);
@@ -1022,7 +1052,7 @@ textarea.as-textarea {
 .as-auth-input:focus {
     outline: none;
     border-color: var(--as-teal);
-    box-shadow: 0 0 0 3px rgba(20, 89, 84, 0.14);
+    box-shadow: 0 0 0 3px var(--as-focus-ring);
 }
 
 .as-auth-input::placeholder {
@@ -1237,13 +1267,13 @@ textarea.as-textarea {
     bottom: calc(env(safe-area-inset-bottom, 0px) + 5.25rem);
     left: 50%;
     transform: translateX(-50%) translateY(16px);
-    background: #18211f;
+    background: var(--as-toast-bg, #0f172a);
     color: #ffffff;
     font-size: 0.84rem;
     font-weight: 600;
     padding: 0.6rem 1.15rem;
     border-radius: 9999px;
-    box-shadow: 0 10px 25px rgba(24, 33, 31, 0.25);
+    box-shadow: var(--as-shadow-float);
     opacity: 0;
     pointer-events: none;
     transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1257,4 +1287,76 @@ textarea.as-textarea {
 .as-toast--visible {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+}
+
+/* Theme Switcher Cards */
+.as-theme-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.85rem;
+    border-radius: var(--as-control-radius);
+    border: 2px solid var(--as-line);
+    background: var(--as-surface);
+    text-align: left;
+    transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
+    cursor: pointer;
+    width: 100%;
+}
+
+.as-theme-card:hover {
+    border-color: var(--as-muted);
+}
+
+.as-theme-card:active {
+    transform: scale(0.98);
+}
+
+.as-theme-card.is-active {
+    border-color: var(--as-teal);
+    background: var(--as-teal-soft);
+}
+
+.as-theme-preview {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid;
+    margin-bottom: 0.65rem;
+}
+
+.as-theme-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.as-theme-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--as-ink);
+    line-height: 1.25;
+}
+
+.as-theme-desc {
+    font-size: 0.75rem;
+    color: var(--as-muted);
+}
+
+.as-theme-check {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    display: none;
+    width: 1.3rem;
+    height: 1.3rem;
+    place-items: center;
+    border-radius: 9999px;
+    background: var(--as-teal);
+    color: #ffffff;
+}
+
+.as-theme-card.is-active .as-theme-check {
+    display: grid;
 }

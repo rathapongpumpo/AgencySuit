@@ -3,7 +3,17 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="theme-color" content="#f4f2ed">
+        <meta name="theme-color" content="#f6f8fb">
+        <script>
+            (function() {
+                const theme = localStorage.getItem('as_theme') || 'navy';
+                document.documentElement.setAttribute('data-theme', theme);
+                const metaTheme = document.querySelector('meta[name="theme-color"]');
+                if (metaTheme) {
+                    metaTheme.setAttribute('content', theme === 'pine' ? '#f8f7f4' : '#f6f8fb');
+                }
+            })();
+        </script>
         <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
         <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
         <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
