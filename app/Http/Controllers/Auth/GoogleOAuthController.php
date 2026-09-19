@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\GoogleOAuthService;
+use App\Services\PostHogAnalytics;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +27,7 @@ class GoogleOAuthController extends Controller
         return $google->redirect($request);
     }
 
-    public function callback(Request $request, GoogleOAuthService $google): RedirectResponse
+    public function callback(Request $request, GoogleOAuthService $google, PostHogAnalytics $analytics): RedirectResponse
     {
         if ($request->filled('error')) {
             Log::warning('Google OAuth returned error parameter', [
@@ -47,7 +48,7 @@ class GoogleOAuthController extends Controller
 
         try {
             $identity = $google->identityFromCallback($request);
-            $user = $this->findOrCreateUser($identity);
+            [$user, $created] = $this->findOrCreateUser($identity);
         } catch (Throwable $e) {
             Log::error('Google OAuth callback failed: '.$e->getMessage(), [
                 'exception' => $e,
@@ -60,14 +61,16 @@ class GoogleOAuthController extends Controller
 
         Auth::login($user);
         $request->session()->regenerate();
+        $analytics->track($request, $created ? 'signup_completed' : 'login_completed');
 
         return redirect()->route('today');
     }
 
     /** @param array{id: string, email: string, name: string} $identity */
-    private function findOrCreateUser(array $identity): User
+    /** @return array{0: User, 1: bool} */
+    private function findOrCreateUser(array $identity): array
     {
-        return DB::transaction(function () use ($identity): User {
+        return DB::transaction(function () use ($identity): array {
             $providerUser = User::query()
                 ->where('provider', 'google')
                 ->where('provider_id', $identity['id'])
@@ -75,7 +78,7 @@ class GoogleOAuthController extends Controller
                 ->first();
 
             if ($providerUser !== null) {
-                return $providerUser;
+                return [$providerUser, false];
             }
 
             $emailUser = User::query()->where('email', $identity['email'])->lockForUpdate()->first();
@@ -90,16 +93,16 @@ class GoogleOAuthController extends Controller
                     'provider_id' => $identity['id'],
                 ])->save();
 
-                return $emailUser;
+                return [$emailUser, false];
             }
 
-            return User::create([
+            return [User::create([
                 'name' => $identity['name'],
                 'email' => $identity['email'],
                 'provider' => 'google',
                 'provider_id' => $identity['id'],
                 'password' => null,
-            ]);
+            ]), true];
         });
     }
 }

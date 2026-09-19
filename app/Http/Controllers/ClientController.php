@@ -6,6 +6,7 @@ use App\Http\Requests\ClientRequest;
 use App\Models\Client;
 use App\Services\MatchingService;
 use App\Services\PlanService;
+use App\Services\PostHogAnalytics;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -50,11 +51,14 @@ class ClientController extends Controller
         ]);
     }
 
-    public function store(ClientRequest $request, PlanService $planService): RedirectResponse
+    public function store(ClientRequest $request, PlanService $planService, PostHogAnalytics $analytics): RedirectResponse
     {
         $limit = $planService->limit($request->user(), 'clients');
 
-        if ($planService->reached($request->user(), 'clients', $request->user()->clients()->count())) {
+        $clientCount = $request->user()->clients()->count();
+        if ($planService->reached($request->user(), 'clients', $clientCount)) {
+            $analytics->track($request, 'free_limit_reached');
+
             return to_route('clients.create')
                 ->withInput()
                 ->with('limit_reached', "แพ็กเกจฟรีเพิ่มลูกค้าได้สูงสุด {$limit} รายการ ข้อมูลเดิมยังอยู่ครบ");
@@ -62,10 +66,14 @@ class ClientController extends Controller
 
         $client = $request->user()->clients()->create($request->validated());
 
+        if ($clientCount === 0) {
+            $analytics->track($request, 'first_client_created');
+        }
+
         return to_route('clients.show', $client)->with('success', 'บันทึกลูกค้าแล้ว');
     }
 
-    public function show(Client $client, MatchingService $matchingService): View
+    public function show(Client $client, MatchingService $matchingService, PostHogAnalytics $analytics): View
     {
         Gate::authorize('view', $client);
         $client->load([
@@ -73,9 +81,14 @@ class ClientController extends Controller
             'deals' => fn ($query) => $query->latest(),
         ]);
 
+        $propertyMatches = $matchingService->forClient($client);
+        if ($propertyMatches->isNotEmpty()) {
+            $analytics->track(request(), 'match_viewed');
+        }
+
         return view('clients.show', [
             'client' => $client,
-            'propertyMatches' => $matchingService->forClient($client),
+            'propertyMatches' => $propertyMatches,
         ]);
     }
 

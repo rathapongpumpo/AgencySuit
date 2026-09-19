@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\FollowUpRequest;
 use App\Models\Client;
 use App\Models\FollowUp;
+use App\Services\PostHogAnalytics;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -19,10 +20,13 @@ class FollowUpController extends Controller
         return view('followups.create', ['clients' => $request->user()->clients()->orderBy('name')->get()]);
     }
 
-    public function storeQuickAdd(FollowUpRequest $request): RedirectResponse|JsonResponse
+    public function storeQuickAdd(FollowUpRequest $request, PostHogAnalytics $analytics): RedirectResponse|JsonResponse
     {
         $client = $request->user()->clients()->findOrFail($request->validated('client_id'));
-        $followUp = $this->save($request, $client);
+        [$followUp, $created] = $this->save($request, $client);
+        if ($created) {
+            $analytics->track($request, 'followup_created');
+        }
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -36,16 +40,20 @@ class FollowUpController extends Controller
                     'note' => $followUp->note,
                     'status' => $followUp->status,
                 ],
+                'posthog_events' => $analytics->pullEvents($request),
             ]);
         }
 
         return to_route('clients.show', $client)->with('success', 'ตั้งเวลาติดตามแล้ว');
     }
 
-    public function store(FollowUpRequest $request, Client $client): RedirectResponse|JsonResponse
+    public function store(FollowUpRequest $request, Client $client, PostHogAnalytics $analytics): RedirectResponse|JsonResponse
     {
         Gate::authorize('view', $client);
-        $followUp = $this->save($request, $client);
+        [$followUp, $created] = $this->save($request, $client);
+        if ($created) {
+            $analytics->track($request, 'followup_created');
+        }
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -59,18 +67,20 @@ class FollowUpController extends Controller
                     'note' => $followUp->note,
                     'status' => $followUp->status,
                 ],
+                'posthog_events' => $analytics->pullEvents($request),
             ]);
         }
 
         return to_route('clients.show', $client)->with('success', 'ตั้งเวลาติดตามแล้ว');
     }
 
-    private function save(FollowUpRequest $request, Client $client): FollowUp
+    /** @return array{0: FollowUp, 1: bool} */
+    private function save(FollowUpRequest $request, Client $client): array
     {
         $data = $request->validated();
         $dueDate = isset($data['days']) ? today()->addDays((int) $data['days']) : Carbon::parse($data['due_date']);
         $dateStr = $dueDate->toDateString();
-        $note = !empty($data['note']) ? trim((string) $data['note']) : null;
+        $note = ! empty($data['note']) ? trim((string) $data['note']) : null;
 
         // Deduplicate: If there is already a pending follow-up on this date for this client, update it instead of creating duplicates
         $existing = $request->user()->followUps()
@@ -84,15 +94,15 @@ class FollowUpController extends Controller
                 $existing->update(['note' => $note]);
             }
 
-            return $existing;
+            return [$existing, false];
         }
 
-        return $request->user()->followUps()->create([
+        return [$request->user()->followUps()->create([
             'client_id' => $client->id,
             'due_date' => $dateStr,
             'note' => $note,
             'status' => 'pending',
-        ]);
+        ]), true];
     }
 
     public function complete(Request $request, FollowUp $followUp): RedirectResponse|JsonResponse

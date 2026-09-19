@@ -15,7 +15,10 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\FollowUpController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\TodayController;
+use App\Services\PostHogAnalytics;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\View;
 
 Route::redirect('/', '/today');
 
@@ -78,7 +81,11 @@ Route::middleware('auth')->group(function (): void {
     Route::delete('/deals/{deal}', [DealController::class, 'destroy'])->name('deals.destroy');
     Route::get('/feedback/create', [FeedbackController::class, 'create'])->name('feedback.create');
     Route::post('/feedback', [FeedbackController::class, 'store'])->name('feedback.store');
-    Route::view('/upgrade', 'upgrade')->name('upgrade');
+    Route::get('/upgrade', function (Request $request, PostHogAnalytics $analytics): View {
+        $analytics->track($request, 'upgrade_viewed');
+
+        return view('upgrade');
+    })->name('upgrade');
     Route::view('/more', 'more')->name('more');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });

@@ -14,7 +14,7 @@
     {{-- Search and Filter Form --}}
     <form method="GET" action="{{ route('clients.index') }}" class="mt-4 space-y-2.5">
         <div class="relative">
-            <input type="search" name="q" value="{{ $currentSearch }}" placeholder="ค้นหาชื่อลูกค้า, เบอร์โทร, ทำเล..." class="as-input pl-10 pr-20 text-sm">
+            <input type="search" name="q" value="{{ $currentSearch }}" placeholder="ค้นหาชื่อลูกค้า, ทำเล, หมายเหตุ..." class="as-input pl-10 pr-20 text-sm">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-stone-400 pointer-events-none">
                 <x-icon name="search" size="16" />
             </span>

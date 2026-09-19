@@ -2,9 +2,11 @@
 
 namespace Tests\Unit;
 
+use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
@@ -23,7 +25,7 @@ class AdminTest extends TestCase
 
     public function test_admin_middleware_blocks_guest_or_regular_user(): void
     {
-        $middleware = new EnsureUserIsAdmin();
+        $middleware = new EnsureUserIsAdmin;
 
         // 1. Guest (no user)
         $requestWithoutUser = Request::create('/admin/users', 'GET');
@@ -49,7 +51,7 @@ class AdminTest extends TestCase
 
     public function test_admin_middleware_allows_admin_user(): void
     {
-        $middleware = new EnsureUserIsAdmin();
+        $middleware = new EnsureUserIsAdmin;
         $admin = new User(['name' => 'Super Admin', 'is_admin' => true]);
 
         $request = Request::create('/admin/users', 'GET');
@@ -63,10 +65,10 @@ class AdminTest extends TestCase
 
     public function test_admin_auth_controller_shows_login_for_guests(): void
     {
-        $controller = new \App\Http\Controllers\Admin\AdminAuthController();
+        $controller = new AdminAuthController;
         $response = $controller->showLoginForm();
 
-        $this->assertInstanceOf(\Illuminate\View\View::class, $response);
+        $this->assertInstanceOf(View::class, $response);
         $this->assertSame('admin.auth.login', $response->name());
     }
 }

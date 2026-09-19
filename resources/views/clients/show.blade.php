@@ -89,7 +89,7 @@
     {{-- Matching Properties --}}
     <section class="as-work-section mt-6" aria-labelledby="property-matches-heading">
         <div class="as-section-head">
-            <h2 id="property-matches-heading" class="as-section-title">ทรัพย์ที่ตรงกับลูกค้านี้</h2>
+            <h2 id="property-matches-heading" class="as-section-title">ทรัพย์ที่ตรงกับลูกค้าคนนี้</h2>
             <span class="as-count">{{ $propertyMatches->count() }}</span>
         </div>
         @if ($propertyMatches->isEmpty())

@@ -22,6 +22,10 @@ document.querySelectorAll('[data-password-toggle]').forEach((button) => {
     });
 });
 
+function capturePostHogEvents(response) {
+    window.captureAgencySuitPostHogEvents?.(response?.posthog_events);
+}
+
 const quickAddSheet = document.getElementById('quick-add-sheet');
 
 document.querySelectorAll('[data-quick-add-open]').forEach((button) => {
@@ -355,6 +359,7 @@ if (addFollowupForm) {
 
             if (res.ok) {
                 const data = await res.json();
+                capturePostHogEvents(data);
                 showToast(data.message || 'ตั้งเวลาติดตามแล้ว ✓');
 
                 const pendingList = document.getElementById('pending-followup-list');
@@ -674,4 +679,3 @@ const initThemeSwitcher = () => {
 };
 
 initThemeSwitcher();
-

@@ -9,6 +9,7 @@ use App\Models\Property;
 use App\Models\PropertyPhoto;
 use App\Services\MatchingService;
 use App\Services\PlanService;
+use App\Services\PostHogAnalytics;
 use App\Services\PropertyPhotoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -63,12 +64,14 @@ class PropertyController extends Controller
         ]);
     }
 
-    public function store(PropertyRequest $request, PlanService $planService): RedirectResponse
+    public function store(PropertyRequest $request, PlanService $planService, PostHogAnalytics $analytics): RedirectResponse
     {
         $limit = $planService->limit($request->user(), 'properties');
         $propertyCount = $request->user()->properties()->count();
 
         if ($planService->reached($request->user(), 'properties', $propertyCount)) {
+            $analytics->track($request, 'free_limit_reached');
+
             return to_route('properties.create')
                 ->withInput()
                 ->with('limit_reached', "แพ็กเกจฟรีเพิ่มทรัพย์ได้สูงสุด {$limit} รายการ ข้อมูลเดิมยังอยู่ครบ");
@@ -79,18 +82,27 @@ class PropertyController extends Controller
             'status' => Property::DEFAULT_STATUS,
         ]);
 
+        if ($propertyCount === 0) {
+            $analytics->track($request, 'first_property_created');
+        }
+
         return to_route('properties.show', $property)->with('success', 'บันทึกทรัพย์แล้ว');
     }
 
-    public function show(Property $property, MatchingService $matchingService, PlanService $planService): View
+    public function show(Property $property, MatchingService $matchingService, PlanService $planService, PostHogAnalytics $analytics): View
     {
         Gate::authorize('view', $property);
         $property->load(['photos', 'primaryPhoto']);
 
+        $clientMatches = $matchingService->forProperty($property);
+        if ($clientMatches->isNotEmpty()) {
+            $analytics->track(request(), 'match_viewed');
+        }
+
         return view('properties.show', [
             'property' => $property,
             'statusOptions' => config('properties.statuses', []),
-            'clientMatches' => $matchingService->forProperty($property),
+            'clientMatches' => $clientMatches,
             'photoLimit' => $planService->limit(request()->user(), 'photos_per_property'),
         ]);
     }
@@ -140,7 +152,7 @@ class PropertyController extends Controller
         return to_route('properties.show', $property)->with('success', 'เปลี่ยนสถานะแล้ว');
     }
 
-    public function storePhoto(PropertyPhotoRequest $request, Property $property, PropertyPhotoService $photoService, PlanService $planService): RedirectResponse
+    public function storePhoto(PropertyPhotoRequest $request, Property $property, PropertyPhotoService $photoService, PlanService $planService, PostHogAnalytics $analytics): RedirectResponse
     {
         Gate::authorize('update', $property);
 
@@ -149,6 +161,8 @@ class PropertyController extends Controller
         $existing = $property->photos()->count();
 
         if ($limit !== null && $existing + count($files) > $limit) {
+            $analytics->track($request, 'free_limit_reached');
+
             return back()->withInput()->withErrors([
                 'photos' => "แพ็กเกจฟรีเก็บรูปได้สูงสุด {$limit} รูปต่อทรัพย์ รูปเดิมยังอยู่ครบ",
             ]);

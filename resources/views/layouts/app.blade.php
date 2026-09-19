@@ -27,6 +27,7 @@
         @unless (app()->environment('testing'))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endunless
+        <x-posthog />
     </head>
     <body>
         <div class="as-shell">

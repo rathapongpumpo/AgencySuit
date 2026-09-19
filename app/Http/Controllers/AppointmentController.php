@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AppointmentRequest;
 use App\Models\Appointment;
+use App\Services\PostHogAnalytics;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,11 +25,12 @@ class AppointmentController extends Controller
         ]);
     }
 
-    public function store(AppointmentRequest $request): RedirectResponse
+    public function store(AppointmentRequest $request, PostHogAnalytics $analytics): RedirectResponse
     {
         $client = $request->user()->clients()->findOrFail($request->validated('client_id'));
         $property = $request->user()->properties()->findOrFail($request->validated('property_id'));
         $appointment = $request->user()->appointments()->create([...$request->validated(), 'status' => 'scheduled']);
+        $analytics->track($request, 'appointment_created');
 
         return to_route('appointments.show', $appointment)->with('success', 'สร้างนัดดูแล้ว');
     }
@@ -94,7 +97,7 @@ class AppointmentController extends Controller
             : (string) $appointment->appointment_date;
         $timeStr = (string) $appointment->appointment_time;
 
-        $start = \Carbon\Carbon::parse("{$dateStr} {$timeStr}");
+        $start = Carbon::parse("{$dateStr} {$timeStr}");
         $end = (clone $start)->addHour();
 
         $title = 'นัดดู: '.($appointment->property?->name ?? 'ทรัพย์');
@@ -108,12 +111,12 @@ class AppointmentController extends Controller
             ."METHOD:PUBLISH\r\n"
             ."BEGIN:VEVENT\r\n"
             ."UID:appointment-{$appointment->id}@agencysuit\r\n"
-            ."DTSTAMP:".gmdate('Ymd\THis\Z')."\r\n"
-            ."DTSTART:".$start->utc()->format('Ymd\THis\Z')."\r\n"
-            ."DTEND:".$end->utc()->format('Ymd\THis\Z')."\r\n"
-            ."SUMMARY:".addcslashes($title, ",;\\")."\r\n"
-            ."LOCATION:".addcslashes($location, ",;\\")."\r\n"
-            ."DESCRIPTION:".str_replace(["\r\n", "\n"], "\\n", addcslashes($description, ",;\\"))."\r\n"
+            .'DTSTAMP:'.gmdate('Ymd\THis\Z')."\r\n"
+            .'DTSTART:'.$start->utc()->format('Ymd\THis\Z')."\r\n"
+            .'DTEND:'.$end->utc()->format('Ymd\THis\Z')."\r\n"
+            .'SUMMARY:'.addcslashes($title, ',;\\')."\r\n"
+            .'LOCATION:'.addcslashes($location, ',;\\')."\r\n"
+            .'DESCRIPTION:'.str_replace(["\r\n", "\n"], '\\n', addcslashes($description, ',;\\'))."\r\n"
             ."STATUS:CONFIRMED\r\n"
             ."END:VEVENT\r\n"
             ."END:VCALENDAR\r\n";

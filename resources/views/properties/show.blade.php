@@ -88,7 +88,7 @@
                 <form method="POST" action="{{ route('properties.status.update', $property) }}" class="inline-flex items-center gap-2">
                     @csrf
                     @method('PATCH')
-                    <select name="status" onchange="this.form.submit()" class="rounded-lg border border-stone-300 bg-stone-50 px-2.5 py-1 text-xs font-semibold text-stone-800">
+                    <select name="status" aria-label="เปลี่ยนสถานะ" onchange="this.form.submit()" class="rounded-lg border border-stone-300 bg-stone-50 px-2.5 py-1 text-xs font-semibold text-stone-800">
                         @foreach ($statusOptions as $value => $label)
                             @php($optionLabel = is_array($label) ? $label[$property->transaction_type] : $label)
                             <option value="{{ $value }}" @selected($property->status === $value)>{{ $optionLabel }}</option>
