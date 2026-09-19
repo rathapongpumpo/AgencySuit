@@ -43,6 +43,26 @@
             <span class="min-w-0 flex-1"><span class="as-setting-label block">ส่งความคิดเห็น</span><span class="as-setting-meta block">บอกสิ่งที่ควรทำให้ง่ายขึ้น</span></span>
             <x-icon name="chevron-right" size="17" class="as-muted" />
         </a>
+        <div class="border-t border-[var(--as-line)] p-4">
+            <div class="flex items-center justify-between mb-2.5">
+                <span class="as-setting-label block">ธีมการแสดงผล</span>
+                <span class="as-setting-meta block">ปรับตามความสบายตา</span>
+            </div>
+            <div class="as-segmented-control" role="group" aria-label="เลือกโหมดการแสดงผล" data-theme-switcher>
+                <button type="button" class="as-segmented-btn" data-theme-value="system" aria-pressed="false">
+                    <x-icon name="laptop" size="15" />
+                    <span>ตามระบบ</span>
+                </button>
+                <button type="button" class="as-segmented-btn" data-theme-value="light" aria-pressed="false">
+                    <x-icon name="sun" size="15" />
+                    <span>สว่าง</span>
+                </button>
+                <button type="button" class="as-segmented-btn" data-theme-value="dark" aria-pressed="false">
+                    <x-icon name="moon" size="15" />
+                    <span>มืด</span>
+                </button>
+            </div>
+        </div>
         <form method="POST" action="{{ route('logout') }}" class="border-t border-[var(--as-line)] px-4 py-2">
             @csrf
             <button type="submit" class="min-h-11 text-sm font-bold text-red-400 hover:text-red-300">ออกจากระบบ</button>

@@ -592,3 +592,57 @@ document.querySelectorAll('form[data-feedback-destroy]').forEach((form) => {
         }
     });
 });
+
+// Appearance Mode Switcher (System / Light / Dark)
+const initThemeSwitcher = () => {
+    const switcher = document.querySelector('[data-theme-switcher]');
+    if (!switcher) return;
+
+    const buttons = switcher.querySelectorAll('[data-theme-value]');
+
+    const updateActiveButton = (mode) => {
+        buttons.forEach((btn) => {
+            const isActive = btn.dataset.themeValue === mode;
+            btn.classList.toggle('is-active', isActive);
+            btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+    };
+
+    const applyTheme = (mode) => {
+        localStorage.setItem('as_theme', mode);
+        document.documentElement.setAttribute('data-theme', mode);
+
+        const isDark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.classList.toggle('dark', isDark);
+
+        const metaTheme = document.querySelector('meta[name="theme-color"]');
+        if (metaTheme) {
+            metaTheme.setAttribute('content', isDark ? '#08090a' : '#f8f9fa');
+        }
+
+        updateActiveButton(mode);
+    };
+
+    const currentMode = localStorage.getItem('as_theme') || 'system';
+    updateActiveButton(currentMode);
+
+    buttons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            applyTheme(btn.dataset.themeValue);
+        });
+    });
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        const mode = localStorage.getItem('as_theme') || 'system';
+        if (mode === 'system') {
+            document.documentElement.classList.toggle('dark', e.matches);
+            const metaTheme = document.querySelector('meta[name="theme-color"]');
+            if (metaTheme) {
+                metaTheme.setAttribute('content', e.matches ? '#08090a' : '#f8f9fa');
+            }
+        }
+    });
+};
+
+initThemeSwitcher();
+
