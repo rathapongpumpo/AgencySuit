@@ -60,4 +60,13 @@ class AdminTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('Authorized', $response->getContent());
     }
+
+    public function test_admin_auth_controller_shows_login_for_guests(): void
+    {
+        $controller = new \App\Http\Controllers\Admin\AdminAuthController();
+        $response = $controller->showLoginForm();
+
+        $this->assertInstanceOf(\Illuminate\View\View::class, $response);
+        $this->assertSame('admin.auth.login', $response->name());
+    }
 }

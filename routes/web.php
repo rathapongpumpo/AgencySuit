@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminFeedbackController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\AppointmentController;
@@ -80,8 +81,27 @@ Route::middleware('auth')->group(function (): void {
     Route::view('/upgrade', 'upgrade')->name('upgrade');
     Route::view('/more', 'more')->name('more');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+});
 
-    Route::middleware('admin')->prefix('admin')->name('admin.')->group(function (): void {
+/*
+|--------------------------------------------------------------------------
+| Dedicated Admin Portal Routes
+|--------------------------------------------------------------------------
+*/
+Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/admin/login', [AdminAuthController::class, 'login'])->middleware('throttle:5,1')->name('admin.login.store');
+
+Route::prefix('admin')->name('admin.')->group(function (): void {
+    Route::get('/', function () {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            return redirect()->route('admin.users.index');
+        }
+
+        return redirect()->route('admin.login');
+    });
+
+    Route::middleware(['auth', 'admin'])->group(function (): void {
+        Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
         Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
         Route::patch('/users/{user}/plan', [AdminUserController::class, 'updatePlan'])->name('users.update-plan');
         Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('feedback.index');

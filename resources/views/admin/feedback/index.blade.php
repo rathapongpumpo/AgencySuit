@@ -1,28 +1,13 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'จัดการข้อเสนอแนะ | AgencySuit Admin')
 
 @section('content')
-    <div class="as-page-head">
-        <div class="flex items-center gap-3">
-            <x-back-button fallback="{{ route('more') }}" />
-            <div>
-                <h1 class="as-page-title">จัดการข้อเสนอแนะ</h1>
-                <p class="as-page-subtitle">ทั้งหมด {{ number_format($counts['total']) }} รายการ (ใหม่: {{ $counts['new'] }}, รอทำ: {{ $counts['planned'] }}, เสร็จแล้ว: {{ $counts['done'] }})</p>
-            </div>
+    <div class="as-page-head mb-4">
+        <div>
+            <h1 class="as-page-title">จัดการข้อเสนอแนะ</h1>
+            <p class="as-page-subtitle">ทั้งหมด {{ number_format($counts['total']) }} รายการ (ใหม่: {{ $counts['new'] }}, รอทำ: {{ $counts['planned'] }}, เสร็จแล้ว: {{ $counts['done'] }})</p>
         </div>
-    </div>
-
-    {{-- Admin Navigation Tabs --}}
-    <div class="mb-4 flex gap-2 border-b border-stone-200 pb-2">
-        <a href="{{ route('admin.users.index') }}" class="as-pill flex items-center gap-1.5">
-            <x-icon name="users" size="16" />
-            <span>ผู้ใช้งาน</span>
-        </a>
-        <a href="{{ route('admin.feedback.index') }}" class="as-pill is-active flex items-center gap-1.5">
-            <x-icon name="message" size="16" />
-            <span>ข้อเสนอแนะ ({{ $counts['total'] }})</span>
-        </a>
     </div>
 
     @if (session('success'))
