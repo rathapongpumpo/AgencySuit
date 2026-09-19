@@ -3,120 +3,95 @@
 @section('title', 'จัดการผู้ใช้งาน | AgencySuit Admin')
 
 @section('content')
-    <div class="as-page-head mb-4">
+    <div class="as-page-head">
         <div>
-            <h1 class="as-page-title">จัดการผู้ใช้งาน</h1>
+            <h1 class="as-page-title">ผู้ใช้งานในระบบ</h1>
             <p class="as-page-subtitle">ทั้งหมด {{ number_format($counts['total']) }} บัญชี (Free: {{ $counts['free'] }}, Pro: {{ $counts['pro'] }})</p>
         </div>
     </div>
 
-    @if (session('success'))
-        <div class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    {{-- Search & Filter --}}
-    <div class="mb-4 space-y-2">
-        <form method="GET" action="{{ route('admin.users.index') }}" class="flex gap-2">
-            <input
-                type="search"
-                name="q"
-                value="{{ request('q') }}"
-                placeholder="ค้นหาชื่อ หรืออีเมล..."
-                class="as-input flex-1"
-            />
-            @if (request('plan'))
-                <input type="hidden" name="plan" value="{{ request('plan') }}" />
+    {{-- Search and Filter Form --}}
+    <form method="GET" action="{{ route('admin.users.index') }}" class="mt-4 space-y-2.5">
+        <div class="relative">
+            <input type="search" name="q" value="{{ request('q') }}" placeholder="ค้นหาชื่อ หรืออีเมลผู้ใช้..." class="as-input pl-10 pr-20 text-sm">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-stone-400 pointer-events-none">
+                <x-icon name="search" size="16" />
+            </span>
+            @if (request('q') || request('plan'))
+                <a href="{{ route('admin.users.index') }}" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-xs font-semibold text-stone-400 hover:text-stone-700">ล้างค้นหา</a>
             @endif
-            <button type="submit" class="as-action-secondary px-4 py-2">ค้นหา</button>
-        </form>
+        </div>
 
-        <div class="flex flex-wrap gap-1.5 pt-1">
+        {{-- Filter Chips --}}
+        <div class="flex gap-2 overflow-x-auto pb-1">
             <a href="{{ route('admin.users.index', array_filter(['q' => request('q')])) }}"
-               @class(['as-filter-chip', 'is-active' => ! request('plan')])>
+                @class(['as-chip is-active' => ! request('plan'), 'as-chip' => request('plan')])>
                 ทั้งหมด ({{ $counts['total'] }})
             </a>
             <a href="{{ route('admin.users.index', array_filter(['plan' => 'free', 'q' => request('q')])) }}"
-               @class(['as-filter-chip', 'is-active' => request('plan') === 'free'])>
+                @class(['as-chip is-active' => request('plan') === 'free', 'as-chip' => request('plan') !== 'free'])>
                 FREE ({{ $counts['free'] }})
             </a>
             <a href="{{ route('admin.users.index', array_filter(['plan' => 'pro', 'q' => request('q')])) }}"
-               @class(['as-filter-chip', 'is-active' => request('plan') === 'pro'])>
+                @class(['as-chip is-active' => request('plan') === 'pro', 'as-chip' => request('plan') !== 'pro'])>
                 PRO ({{ $counts['pro'] }})
             </a>
         </div>
-    </div>
+    </form>
 
-    {{-- User List Cards --}}
+    {{-- User List Surface --}}
     @if ($users->isEmpty())
-        <div class="rounded-2xl border border-dashed border-stone-300 bg-white p-6 text-center text-stone-500">
-            <p>ไม่พบบัญชีผู้ใช้ตามเงื่อนไขที่ค้นหา</p>
-            @if (request('q') || request('plan'))
-                <a href="{{ route('admin.users.index') }}" class="as-action-secondary mt-3 inline-block text-xs">ล้างตัวกรอง</a>
-            @endif
+        <div class="mt-5 as-surface overflow-hidden">
+            <x-empty-state title="ไม่พบบัญชีผู้ใช้" description="ลองเปลี่ยนคำค้นหา หรือกดล้างตัวกรองเพื่อดูผู้ใช้ทั้งหมด" action="ดูผู้ใช้ทั้งหมด" :action-url="route('admin.users.index')" />
         </div>
     @else
-        <div class="space-y-3">
+        <ul class="as-list-surface mt-4">
             @foreach ($users as $user)
-                <div class="as-card space-y-2.5 p-3.5">
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="min-w-0 flex-1">
-                            <div class="flex items-center gap-2">
-                                <span class="truncate font-semibold text-stone-900">{{ $user->name }}</span>
+                <li class="as-list-row items-center justify-between gap-3">
+                    <span class="as-icon-box shrink-0">
+                        <x-icon name="users" size="20" />
+                    </span>
+                    <div class="as-list-copy min-w-0">
+                        <div class="as-list-title-line">
+                            <span class="as-list-title">{{ $user->name }}</span>
+                            <div class="flex items-center gap-1.5 shrink-0">
                                 @if ($user->is_admin)
-                                    <span class="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-900">ADMIN</span>
+                                    <span class="rounded-full px-2 py-0.5 text-xs font-bold bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">ADMIN</span>
                                 @endif
+                                <span @class([
+                                    'rounded-full px-2 py-0.5 text-xs font-bold',
+                                    'bg-[var(--as-teal-soft)] text-[var(--as-teal)]' => $user->plan === 'pro',
+                                    'bg-[var(--as-surface-raised)] text-[var(--as-muted)] border border-[var(--as-line)]' => $user->plan !== 'pro',
+                                ])>
+                                    {{ strtoupper($user->plan) }}
+                                </span>
                             </div>
-                            <div class="truncate text-xs text-stone-500">{{ $user->email }}</div>
-                            <div class="text-[11px] text-stone-400">สมัครเมื่อ {{ $user->created_at->format('d/m/Y H:i') }}</div>
                         </div>
-                        <div>
-                            @if ($user->plan === 'pro')
-                                <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">PRO</span>
-                            @else
-                                <span class="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-semibold text-stone-700">FREE</span>
-                            @endif
+                        <div class="as-list-meta truncate">{{ $user->email }}</div>
+                        <div class="as-list-meta text-xs">
+                            ทรัพย์ <strong>{{ $user->properties_count }}</strong> · ลูกค้า <strong>{{ $user->clients_count }}</strong> · ดีล <strong>{{ $user->deals_count }}</strong>
+                            <span class="mx-1 text-[var(--as-line-strong)]">·</span>
+                            {{ $user->created_at->format('d/m/Y') }}
                         </div>
                     </div>
-
-                    {{-- Activity Summary --}}
-                    <div class="grid grid-cols-3 gap-2 rounded-xl bg-stone-50 p-2 text-center text-xs">
-                        <div>
-                            <span class="text-stone-400 block text-[10px]">ทรัพย์</span>
-                            <span class="font-bold text-stone-700">{{ $user->properties_count }}</span>
-                        </div>
-                        <div>
-                            <span class="text-stone-400 block text-[10px]">ลูกค้า</span>
-                            <span class="font-bold text-stone-700">{{ $user->clients_count }}</span>
-                        </div>
-                        <div>
-                            <span class="text-stone-400 block text-[10px]">ดีล</span>
-                            <span class="font-bold text-stone-700">{{ $user->deals_count }}</span>
-                        </div>
-                    </div>
-
-                    {{-- Actions --}}
-                    <div class="flex items-center justify-end border-t border-stone-100 pt-2">
-                        <form method="POST" action="{{ route('admin.users.update-plan', $user) }}">
-                            @csrf
-                            @method('PATCH')
-                            @if ($user->plan === 'pro')
-                                <input type="hidden" name="plan" value="free" />
-                                <button type="submit" class="as-action-secondary px-3 py-1.5 text-xs text-stone-700">
-                                    ปรับเป็น FREE
-                                </button>
-                            @else
-                                <input type="hidden" name="plan" value="pro" />
-                                <button type="submit" class="as-action-primary px-3 py-1.5 text-xs">
-                                    อัปเกรดเป็น PRO
-                                </button>
-                            @endif
-                        </form>
-                    </div>
-                </div>
+                    <form method="POST" action="{{ route('admin.users.update-plan', $user) }}" class="shrink-0">
+                        @csrf
+                        @method('PATCH')
+                        @if ($user->plan === 'pro')
+                            <input type="hidden" name="plan" value="free" />
+                            <button type="submit" class="as-row-control !mt-0 text-xs" title="ปรับเป็น Free">
+                                ปรับเป็น Free
+                            </button>
+                        @else
+                            <input type="hidden" name="plan" value="pro" />
+                            <button type="submit" class="as-row-control !mt-0 text-xs !border-[var(--as-teal)] !text-[var(--as-teal)]" title="อัปเกรด Pro">
+                                อัปเป็น Pro
+                            </button>
+                        @endif
+                    </form>
+                </li>
             @endforeach
-        </div>
+        </ul>
 
         <div class="mt-4">
             {{ $users->links() }}

@@ -25,58 +25,49 @@
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endunless
     </head>
-    <body class="bg-[var(--as-canvas)] text-[var(--as-ink)] min-h-screen">
-        <div class="max-w-2xl mx-auto min-h-screen pb-12">
-            {{-- Admin Dedicated Topbar --}}
-            <header class="flex items-center justify-between px-4 py-3.5 border-b border-[var(--as-line)] bg-[var(--as-topbar-bg)] backdrop-blur-md sticky top-0 z-20">
-                <a href="{{ route('admin.users.index') }}" class="inline-flex items-center gap-2 font-bold text-sm text-[var(--as-ink)]">
-                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--as-teal)] text-[var(--as-cta-ink)] font-extrabold text-xs">AS</span>
-                    <span>AgencySuit <span class="text-xs px-1.5 py-0.5 rounded bg-[var(--as-teal-soft)] text-[var(--as-teal)] font-bold">Admin</span></span>
+    <body>
+        <div class="as-shell">
+            {{-- Standard App Topbar --}}
+            <header class="as-topbar">
+                <a href="{{ route('admin.users.index') }}" class="as-brand">
+                    <span class="as-brand-mark">AS</span>
+                    <span class="as-brand-name">AgencySuit Admin</span>
                 </a>
-
-                <div class="flex items-center gap-3">
-                    <span class="hidden sm:inline text-xs text-[var(--as-muted)] truncate max-w-[180px]">{{ auth()->user()->email }}</span>
-                    <form method="POST" action="{{ route('admin.logout') }}" class="inline">
-                        @csrf
-                        <button type="submit" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-[var(--as-line)] bg-[var(--as-surface)] text-[var(--as-muted)] hover:text-[var(--as-coral)] hover:border-[var(--as-coral)] transition-colors">
-                            <x-icon name="arrow-left" size="14" />
-                            <span>ออกจากระบบ</span>
-                        </button>
-                    </form>
-                </div>
+                <form method="POST" action="{{ route('admin.logout') }}" class="inline">
+                    @csrf
+                    <button type="submit" class="as-row-control !mt-0 !min-h-[2rem] text-xs hover:!text-[var(--as-coral)] hover:!border-[var(--as-coral)]">
+                        <x-icon name="arrow-left" size="13" />
+                        <span>ออกจากระบบ</span>
+                    </button>
+                </form>
             </header>
 
-            {{-- Admin Navigation Tabs --}}
-            <nav class="flex gap-2 px-4 pt-3 pb-2 border-b border-[var(--as-line)] bg-[var(--as-surface)]/50">
-                <a href="{{ route('admin.users.index') }}" @class([
-                    'inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all',
-                    'bg-[var(--as-teal)] text-[var(--as-cta-ink)]' => request()->routeIs('admin.users.*'),
-                    'border border-[var(--as-line)] text-[var(--as-muted)] hover:text-[var(--as-ink)] hover:bg-[var(--as-surface-raised)]' => ! request()->routeIs('admin.users.*'),
-                ])>
-                    <x-icon name="users" size="14" />
-                    <span>ผู้ใช้งาน</span>
-                </a>
-                <a href="{{ route('admin.feedback.index') }}" @class([
-                    'inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all',
-                    'bg-[var(--as-teal)] text-[var(--as-cta-ink)]' => request()->routeIs('admin.feedback.*'),
-                    'border border-[var(--as-line)] text-[var(--as-muted)] hover:text-[var(--as-ink)] hover:bg-[var(--as-surface-raised)]' => ! request()->routeIs('admin.feedback.*'),
-                ])>
-                    <x-icon name="message" size="14" />
-                    <span>ข้อเสนอแนะ</span>
-                </a>
-            </nav>
+            {{-- Clean Admin Segmented Tab Switcher --}}
+            <div class="px-4 pt-3 pb-1">
+                <div class="as-choice-grid !grid-cols-2 !mt-0">
+                    <a href="{{ route('admin.users.index') }}" @class([
+                        'as-choice !min-h-[2.4rem] text-xs font-bold no-underline',
+                        '!border-[var(--as-teal)] !bg-[var(--as-teal-soft)] !text-[var(--as-teal)] font-extrabold' => request()->routeIs('admin.users.*'),
+                    ])>
+                        <x-icon name="users" size="15" class="mr-1.5 inline" />
+                        <span>ผู้ใช้งาน</span>
+                    </a>
+                    <a href="{{ route('admin.feedback.index') }}" @class([
+                        'as-choice !min-h-[2.4rem] text-xs font-bold no-underline',
+                        '!border-[var(--as-teal)] !bg-[var(--as-teal-soft)] !text-[var(--as-teal)] font-extrabold' => request()->routeIs('admin.feedback.*'),
+                    ])>
+                        <x-icon name="message" size="15" class="mr-1.5 inline" />
+                        <span>ข้อเสนอแนะ</span>
+                    </a>
+                </div>
+            </div>
 
-            {{-- Main Content --}}
-            <main class="px-4 pt-5">
+            <main class="as-main !pt-2">
                 @if (session('success'))
-                    <div role="alert" class="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/15 p-3 text-sm text-emerald-300">
-                        {{ session('success') }}
-                    </div>
+                    <p role="status" class="as-alert as-alert--success mb-4">{{ session('success') }}</p>
                 @endif
                 @if (session('error'))
-                    <div role="alert" class="as-alert as-alert--error mb-4">
-                        {{ session('error') }}
-                    </div>
+                    <div role="alert" class="as-alert as-alert--error mb-4">{{ session('error') }}</div>
                 @endif
                 @yield('content')
             </main>
