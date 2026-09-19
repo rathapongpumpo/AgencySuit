@@ -61,11 +61,11 @@
         <div class="mt-4 rounded-xl border border-stone-200 bg-white p-3.5 shadow-sm">
             <span class="text-xs font-semibold text-stone-500">บันทึกลงปฏิทินมือถือ</span>
             <div class="mt-2.5 grid grid-cols-2 gap-2">
-                <a href="{{ $gCalUrl }}" target="_blank" rel="noopener noreferrer" class="as-action-secondary flex items-center justify-center gap-1.5 text-xs font-bold text-teal-900">
+                <a href="{{ $gCalUrl }}" target="_blank" rel="noopener noreferrer" class="as-action-secondary flex items-center justify-center gap-1.5 text-xs font-bold text-[var(--as-teal)]">
                     <x-icon name="calendar" size="15" />
                     <span>Google Calendar</span>
                 </a>
-                <a href="{{ route('appointments.ics', $appointment) }}" class="as-action-secondary flex items-center justify-center gap-1.5 text-xs font-bold text-stone-800">
+                <a href="{{ route('appointments.ics', $appointment) }}" class="as-action-secondary flex items-center justify-center gap-1.5 text-xs font-bold text-[var(--as-ink)]">
                     <x-icon name="clock" size="15" />
                     <span>ดาวน์โหลด .ICS</span>
                 </a>

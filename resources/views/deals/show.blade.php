@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'รายละเอียดดีล | AgencySuit')
 
@@ -43,7 +43,7 @@
         </div>
         <div>
             <dt>คอมมิชชันของฉัน</dt>
-            <dd class="text-base font-bold text-teal-800">{{ number_format($deal->agentCommission(), 2) }} บาท</dd>
+            <dd class="text-base font-extrabold text-[var(--as-teal)]">{{ number_format($deal->agentCommission(), 2) }} บาท</dd>
         </div>
     </dl>
 

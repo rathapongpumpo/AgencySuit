@@ -54,7 +54,7 @@
             </div>
 
             <details class="as-surface overflow-hidden rounded-xl border border-stone-200">
-                <summary class="flex cursor-pointer items-center justify-between p-3.5 text-sm font-semibold text-teal-800 select-none">
+                <summary class="flex cursor-pointer items-center justify-between p-3.5 text-sm font-semibold text-[var(--as-teal)] select-none">
                     <span>+ เพิ่มข้อมูลเจ้าของและสเปกห้อง (ถ้ามี)</span>
                     <x-icon name="chevron-right" size="16" class="text-stone-400" />
                 </summary>

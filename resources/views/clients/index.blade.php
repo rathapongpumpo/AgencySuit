@@ -39,7 +39,7 @@
                     เช่า
                 </a>
             </div>
-            <a href="{{ route('deals.index') }}" class="inline-flex items-center gap-1 text-xs font-bold text-teal-800 shrink-0 hover:underline">
+            <a href="{{ route('deals.index') }}" class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold bg-[var(--as-teal-soft)] text-[var(--as-teal)] shrink-0 hover:opacity-85 transition-opacity">
                 <x-icon name="briefcase" size="14" />
                 <span>ภาพรวมดีล</span>
             </a>

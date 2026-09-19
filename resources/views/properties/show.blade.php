@@ -54,7 +54,7 @@
     <dl class="as-detail-list mt-4">
         <div>
             <dt>ราคา</dt>
-            <dd class="text-base font-bold text-teal-800">{{ $property->formattedPrice() }}</dd>
+            <dd class="text-base font-extrabold text-[var(--as-teal)]">{{ $property->formattedPrice() }}</dd>
         </div>
         <div>
             <dt>ห้องนอน</dt>

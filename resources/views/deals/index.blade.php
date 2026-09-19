@@ -14,7 +14,7 @@
     <div class="grid grid-cols-2 gap-3">
         <div class="as-surface p-4">
             <span class="text-xs font-semibold text-stone-500">คอมมิชชันที่ได้รับแล้ว</span>
-            <p class="mt-1 text-lg font-bold text-teal-800">{{ number_format($closedCommission, 0) }} <span class="text-xs font-normal text-stone-500">บาท</span></p>
+            <p class="mt-1 text-lg font-extrabold text-[var(--as-teal)]">{{ number_format($closedCommission, 0) }} <span class="text-xs font-normal text-stone-500">บาท</span></p>
             <span class="text-[11px] text-stone-400">ปิดแล้ว {{ $closedCount }} ดีล</span>
         </div>
         <div class="as-surface p-4">
@@ -60,7 +60,7 @@
                         </div>
                         <span @class([
                             'as-status font-bold shrink-0',
-                            'border-teal-700 bg-teal-50 text-teal-800' => $deal->stage === 'closed',
+                            'border-[var(--as-teal)] bg-[var(--as-teal-soft)] text-[var(--as-teal)]' => $deal->stage === 'closed',
                         ])>
                             {{ $deal->stageLabel() }}
                         </span>
@@ -68,7 +68,7 @@
 
                     <div class="mt-3 flex items-center justify-between border-t border-stone-100 pt-2.5 text-xs">
                         <span class="text-stone-500">มูลค่า: {{ $deal->amount !== null ? number_format((float) $deal->amount, 0).' บาท' : 'ยังไม่ระบุ' }}</span>
-                        <span class="font-bold text-teal-800">คอมฯ ฉัน: {{ number_format($deal->agentCommission(), 0) }} บาท</span>
+                        <span class="font-extrabold text-[var(--as-teal)]">คอมฯ ฉัน: {{ number_format($deal->agentCommission(), 0) }} บาท</span>
                     </div>
                 </a>
             @endforeach

@@ -42,7 +42,7 @@
     <dl class="as-detail-list mt-4">
         <div>
             <dt>งบประมาณ</dt>
-            <dd class="text-base font-bold text-teal-800">{{ $client->formattedBudget() }}</dd>
+            <dd class="text-base font-extrabold text-[var(--as-teal)]">{{ $client->formattedBudget() }}</dd>
         </div>
         <div>
             <dt>ทำเลที่สนใจ</dt>
@@ -127,7 +127,7 @@
                             $shareProperty = $match['property'];
                         @endphp
                         <label class="flex items-center gap-2 text-sm text-stone-700">
-                            <input type="checkbox" class="size-4 rounded text-teal-700" data-share-property data-share-name="{{ $shareProperty->name }}" data-share-type="{{ $shareProperty->transaction_label }}" data-share-price="{{ $shareProperty->formattedPrice() }}" data-share-bedrooms="{{ $shareProperty->bedrooms }}" data-share-location="{{ $shareProperty->location }}">
+                            <input type="checkbox" class="size-4 rounded accent-[var(--as-teal)] text-[var(--as-teal)]" data-share-property data-share-name="{{ $shareProperty->name }}" data-share-type="{{ $shareProperty->transaction_label }}" data-share-price="{{ $shareProperty->formattedPrice() }}" data-share-bedrooms="{{ $shareProperty->bedrooms }}" data-share-location="{{ $shareProperty->location }}">
                             <span class="truncate">{{ $shareProperty->name }} ({{ $shareProperty->formattedPrice() }})</span>
                         </label>
                     @endforeach
@@ -175,7 +175,7 @@
                     @method('DELETE')
                     <button
                         type="submit"
-                        class="text-xs font-medium text-red-600 hover:text-red-800 p-1"
+                        class="text-xs font-medium text-[var(--as-coral)] hover:text-red-400 p-1"
                     >
                         ล้างทั้งหมด
                     </button>
@@ -200,7 +200,7 @@
                             <form method="POST" action="{{ route('followups.destroy', $followUp) }}" data-followup-destroy>
                                 @csrf
                                 @method('DELETE')
-                                <button class="text-xs text-red-500 hover:text-red-700 p-1" type="submit" title="ลบรายการนี้">
+                                <button class="text-xs text-[var(--as-coral)] hover:text-red-400 p-1" type="submit" title="ลบรายการนี้">
                                     <x-icon name="trash" size="14" />
                                 </button>
                             </form>
@@ -226,7 +226,7 @@
                                     <form method="POST" action="{{ route('followups.destroy', $followUp) }}" data-followup-destroy>
                                         @csrf
                                         @method('DELETE')
-                                        <button class="text-stone-400 hover:text-red-500 p-1" type="submit" title="ลบรายการนี้">
+                                        <button class="text-stone-400 hover:text-[var(--as-coral)] p-1" type="submit" title="ลบรายการนี้">
                                             <x-icon name="trash" size="13" />
                                         </button>
                                     </form>
