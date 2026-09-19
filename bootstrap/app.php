@@ -20,4 +20,20 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        $exceptions->render(function (\Illuminate\Auth\Access\AuthorizationException $e, Request $request) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+
+            return redirect()->route('today')->with('error', 'คุณไม่มีสิทธิ์เข้าถึงหน้านี้ หรือไม่พบข้อมูลดังกล่าว');
+        });
+
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException $e, Request $request) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+
+            return redirect()->route('today')->with('error', 'คุณไม่มีสิทธิ์เข้าถึงหน้านี้ หรือไม่พบข้อมูลดังกล่าว');
+        });
     })->create();

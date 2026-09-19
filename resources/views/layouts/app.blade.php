@@ -35,6 +35,11 @@
             </header>
 
             <main class="as-main">
+                @if (session('error'))
+                    <div role="alert" class="as-alert as-alert--error mb-4">
+                        {{ session('error') }}
+                    </div>
+                @endif
                 @yield('content')
             </main>
         </div>

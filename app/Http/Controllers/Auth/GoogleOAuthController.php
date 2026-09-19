@@ -61,7 +61,7 @@ class GoogleOAuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->intended(route('today', absolute: false));
+        return redirect()->route('today');
     }
 
     /** @param array{id: string, email: string, name: string} $identity */
