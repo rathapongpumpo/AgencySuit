@@ -617,7 +617,7 @@ const initThemeSwitcher = () => {
 
         const metaTheme = document.querySelector('meta[name="theme-color"]');
         if (metaTheme) {
-            metaTheme.setAttribute('content', isDark ? '#08090a' : '#f8f9fa');
+            metaTheme.setAttribute('content', isDark ? '#171427' : '#f6f5fb');
         }
 
         updateActiveButton(mode);
@@ -638,7 +638,7 @@ const initThemeSwitcher = () => {
             document.documentElement.classList.toggle('dark', e.matches);
             const metaTheme = document.querySelector('meta[name="theme-color"]');
             if (metaTheme) {
-                metaTheme.setAttribute('content', e.matches ? '#08090a' : '#f8f9fa');
+                metaTheme.setAttribute('content', e.matches ? '#171427' : '#f6f5fb');
             }
         }
     });

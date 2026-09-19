@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="theme-color" content="#08090a">
+        <meta name="theme-color" content="#171427">
         <script>
             (function() {
                 var mode = localStorage.getItem('as_theme') || 'system';
@@ -15,7 +15,7 @@
                     document.documentElement.classList.remove('dark');
                 }
                 var meta = document.querySelector('meta[name="theme-color"]');
-                if (meta) meta.setAttribute('content', isDark ? '#08090a' : '#f8f9fa');
+                if (meta) meta.setAttribute('content', isDark ? '#171427' : '#f6f5fb');
             })();
         </script>
         <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
